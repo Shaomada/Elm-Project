@@ -66,12 +66,36 @@ moveFor time thing =
 
 
 interaction : List Thing -> List Thing
-interaction = identity
+interaction list = case list of
+  [] -> []
+  (thing :: things) ->
+    things
+    |> List.foldl
+      (\ t (ts, t0) ->
+        let
+          (t0', t') = interact t0 t
+        in
+          (t' :: ts, t0')
+      )
+      ([], thing)
+    |> (\ (ts, t) -> t :: interaction ts )
 
 
-collition : GMod a -> GMod a
-collition =
-    identity
+interact : Thing -> Thing -> (Thing, Thing)
+interact thing1 thing2 =
+  let
+    thing1' = onInteraction thing2 thing1
+    thing2' = onInteraction thing1 thing2
+  in (thing1', thing2')
+
+
+onInteraction : Thing -> Thing -> Thing
+onInteraction that this =
+  case this.intId of
+    Enemy -> case that.intId of
+      Player -> {this | movId = MoveTowards {x = that.x, y = that.y} }
+      _ -> this
+    _ -> this
 
 
 distance : Pos a -> Pos a -> Float
