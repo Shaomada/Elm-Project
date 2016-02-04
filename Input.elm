@@ -58,11 +58,7 @@ input =
     Window.height
     keysParsed
   )
-  |> Signal.sampleOn
-    ( Keyboard.keysDown
-      |> Signal.map (Set.member <| Char.toCode ' ')
-      |> Time.fpsWhen 60
-    )
+  |> Signal.sampleOn (Time.fps 60)
   |> Time.timestamp
   |> Signal.map
     ( \( t, ma ) -> 
