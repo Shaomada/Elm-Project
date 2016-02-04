@@ -5,13 +5,13 @@ import Graphics.Collage exposing (Form)
 import Graphics.Element exposing (Element)
 
 show : G.Model -> Element
-show ( {player, things, windowHeight, windowWidth} as model )
-  = Graphics.Collage.collage windowWidth windowHeight <|
-      showThing player
-      :: List.map showThing things
+show {things, windowHeight, windowWidth} =
+  List.map showThing things
+  |> Graphics.Collage.collage windowWidth windowHeight
+      
 
 showThing : G.Thing -> Form
-showThing ( {showId, x, y, radius} )
-  =  Graphics.Collage.circle radius
-  |> Graphics.Collage.filled showId
+showThing {color, x, y, radius} = 
+  Graphics.Collage.circle radius
+  |> Graphics.Collage.filled color
   |> Graphics.Collage.move (x, y)

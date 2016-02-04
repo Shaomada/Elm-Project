@@ -1,52 +1,61 @@
 module Updates (..) where
 
+import List
+
 import GameTypes exposing (..)
 
 update : ( Maybe Input ) -> Model -> Model
 update minput model =
   case minput of
     ( Just input ) ->
-      gameUpdate input
+      gameUpdate (Debug.watch "input" input)
         { model
           | windowHeight = input.windowHeight
           , windowWidth = input.windowWidth
         }
     Nothing -> model
 
-gameUpdate : GameInput a -> GameModel b -> GameModel b
-gameUpdate ({ timePassed } as input ) (({ player, things }) as model) =
-     let
-         u
-           =  updateSpeed input player
-           >> updatePosition timePassed
-      in
-         collition
-         <| { model |
-              player = u player
-            , things = List.map u things
+
+gameUpdate : GInp a -> GMod b -> GMod b
+gameUpdate input model =
+    { model
+        | things =
+            model.things
+            |> List.map (handleInput input)
+            |> List.map (move input)
+            |> interaction
+    }
+
+
+handleInput : GInp a -> Thing -> Thing
+handleInput input thing =
+    case thing.inpId of
+        FollowMouse -> { thing |
+            movId = MoveTowards {x = input.x, y = input.y} }
+        Ignore -> thing
+
+
+move : GInp a -> Thing -> Thing
+move input thing =
+    case thing.movId of
+        ( MoveTowards target ) -> moveTowardsFor target input.timePassed thing
+        Move -> moveFor input.timePassed thing
+
+
+moveTowardsFor : Pos a -> Float -> Thing -> Thing
+moveTowardsFor {x, y} time thing =
+    let
+        (distance, angle) = toPolar (x-thing.x, y-thing.y)
+    in
+        moveFor time
+            { thing
+                | angle = angle
+                , speed = min thing.speedCap <| distance / time
             }
 
 
-updateSpeed : GameInput a -> Positioned b -> Thing -> Thing
-updateSpeed i player thing =
-    case thing.speedId of
-        FollowMouse -> follow i thing.speedCap thing
-        FollowPlayer -> follow player thing.speedCap thing
-        Static -> thing
-
-follow : Positioned a -> Float -> Positioned( InMotion( b ) ) -> Positioned( InMotion( b ) )
-follow {x, y} speedCap moving =
-    let
-        (distance, angle) = toPolar (x-moving.x, y-moving.y)
-    in
-        { moving
-            | angle = angle
-            , speed = speedCap
-        }
-
-
-updatePosition : Float -> InMotion (Positioned a) -> InMotion (Positioned a)
-updatePosition time thing =
+moveFor : Float -> Mot (Pos a) -> Mot (Pos a)
+moveFor time thing =
     let
         (speedx, speedy) = fromPolar (thing.speed, thing.angle)
     in
@@ -56,21 +65,25 @@ updatePosition time thing =
   }
 
 
-collition : GameModel a -> GameModel a
+interaction : List Thing -> List Thing
+interaction = identity
+
+
+collition : GMod a -> GMod a
 collition =
     identity
 
 
-distance : Positioned a -> Positioned a -> Float
+distance : Pos a -> Pos a -> Float
 distance th1 th2 =
   (th1.x-th2.x)^2 + (th1.y-th2.y)^2
 
 
-minDistance : Circle a -> Circle a -> Float
+minDistance : Cir a -> Cir a -> Float
 minDistance th1 th2 =
   th1.radius + th2.radius
 
 
-touching : Positioned( Circle( a ) ) -> Positioned( Circle( a ) ) -> Bool
+touching : Pos (Cir (a) ) -> Pos (Cir (a) ) -> Bool
 touching th1 th2 =
   distance th1 th2 <= minDistance th1 th2

@@ -8,10 +8,12 @@ import Set
 import Time
 import Char
 import Maybe
+import Debug
 
 import Utility
 import GameTypes exposing (..)
 
+keysParsed : Signal (Mot Emp)
 keysParsed = Signal.map
   ( \ keysDown ->
     let
@@ -33,20 +35,20 @@ keysParsed = Signal.map
         then 1
         else 0
     in
-      { diffSpeed = forward - backward
-      , diffAngle = left - right
+      { speed = forward - backward
+      , angle = left - right
       }
   ) Keyboard.keysDown
 
 input : Signal( Maybe Input )
 input =
   ( Signal.map5
-    ( \ x y w h { diffSpeed, diffAngle } ->
+    ( \ x y w h { speed, angle } ->
       Just
         { x = toFloat x - toFloat w / 2
         , y = toFloat h / 2 - toFloat y
-        , diffSpeed = diffSpeed
-        , diffAngle = diffAngle
+        , speed = speed
+        , angle = angle
         , windowWidth = w
         , windowHeight = h
         , timePassed = Nothing
@@ -77,6 +79,7 @@ input =
             mtold
             |> Maybe.map ( \told -> Time.inSeconds (t - told) )
             |> Maybe.withDefault 0
+            |> Debug.watch "time Passed"
           }
         )
     )

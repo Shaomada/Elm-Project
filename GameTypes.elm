@@ -2,89 +2,89 @@ module GameTypes (..) where
 
 import Color
 
+-- Thing
 
-type UpdateSpeedId =
-  Static
+type InputHandlingId =
+  Ignore
   | FollowMouse
-  | FollowPlayer
 
 
-type CollitionId = NoCollition
+type MoveId =
+  Move
+  | MoveTowards (Pos Emp)
 
 
-type alias Updateable a =
-  { a
-      | speedId : UpdateSpeedId
-      , speedCap : Float
-      , collitionId : CollitionId
+type InteractionId =
+    Player
+    | Enemy
+    | Bouncy
+
+
+type alias Meta =
+  { inpId : InputHandlingId
+  , intId : InteractionId
+  , movId : MoveId
+  , speedCap : Float
   }
 
 
-type alias Showable a =
-  { a
-      | showId : Color.Color
-  }
-
-
-type alias E =
-    {}
-
-
-type alias Positioned a =
+type alias Pos a =
     { a
         | x : Float
         , y : Float
     }
 
 
-type alias InMotion a =
+type alias Mot a =
     { a
         | speed : Float
         , angle : Float
     }
 
-type alias MotionUpdate a =
-    { a
-      | diffSpeed : Float
-      , diffAngle : Float
-    }
 
-type alias Circle a =
+type alias Cir a =
     { a | radius : Float }
 
 
-type alias Timed a =
-    { a | timePassed : Float }
+type alias Col a =
+  { a
+      | color : Color.Color
+  }
+
+    
+type alias Thing = Col (Cir (Mot (Pos Meta) ) )
+
+
+--
+
+
+type alias Emp =
+    {}
  
 
-type alias Windowed b =
-  { b
+type alias Win a =
+  { a
       | windowHeight : Int
       , windowWidth : Int
   }
 
-type alias Thing =
-    Circle
-        (Positioned
-            (InMotion
-                (Updateable
-                    (Showable
-                        E
-                    )
-                )
-                      
-            )
-        )
 
-
-type alias GameModel b =
-    { b
-        | player : Thing
-        , things : List Thing
+type alias GMod b =
+    { b | things : List Thing
     }
 
 
-type alias Model = Windowed ( GameModel ( E ) )
+type alias Model = Win (GMod ( Emp ) )
 
-type alias GameInput a = MotionUpdate( Timed( Positioned( a ) ) )
-type alias Input = Windowed ( GameInput( E ) )
+
+-- Input
+
+
+type alias Tim a =
+    { a | timePassed : Float }
+
+
+type alias GInp a = Tim (Pos (Mot a) )
+
+
+type alias Input = Win (GInp Emp)
