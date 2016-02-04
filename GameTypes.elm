@@ -3,12 +3,26 @@ module GameTypes (..) where
 import Color
 
 
-type UpdateId
-    = UpdateId Int
+type UpdateSpeedId =
+  Static
+  | FollowMouse
+  | FollowPlayer
 
 
-type alias ShowId =
-    Color.Color
+type CollitionId = NoCollition
+
+
+type alias Updateable a =
+  { a
+      | speedId : UpdateSpeedId
+      , collitonId : CollitionId
+  }
+
+
+type alias Showable a =
+  { a
+      | showId : Color.Color
+  }
 
 
 type alias E =
@@ -52,11 +66,16 @@ type alias Thing =
     Circle
         (Positioned
             (InMotion
-                { uId : UpdateId
-                , sId : ShowId
-                }
+                (Updateable
+                    (Showable
+                        E
+                    )
+                )
+                      
             )
         )
+
+
 type alias GameModel b =
     { b
         | player : Thing
