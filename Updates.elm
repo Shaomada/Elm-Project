@@ -33,8 +33,14 @@ updateSpeed i player =
 
 
 updatePosition : Float -> InMotion (Positioned a) -> InMotion (Positioned a)
-updatePosition _ =
-    identity
+updatePosition time thing =
+    let
+        (speedx, speedy) = fromPolar (thing.speed, thing.angle)
+    in
+  { thing
+      | x = thing.x + time * speedx
+      , y = thing.y + time * speedy
+  }
 
 
 collition : GameModel a -> GameModel a
