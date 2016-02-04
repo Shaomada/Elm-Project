@@ -10,7 +10,6 @@ import Char
 import Maybe
 import Debug
 
-import Utility
 import GameTypes exposing (..)
 
 keysParsed : Signal (Mot Emp)
