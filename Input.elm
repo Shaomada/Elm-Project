@@ -58,6 +58,7 @@ input =
     Window.height
     keysParsed
   )
+  |> Signal.sampleOn (Time.fps 60)
   |> Time.timestamp
   |> Signal.map
     ( \( t, ma ) -> 
