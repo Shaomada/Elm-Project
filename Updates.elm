@@ -101,6 +101,7 @@ onInteraction that this =
 distance : Pos a -> Pos a -> Float
 distance th1 th2 =
   (th1.x-th2.x)^2 + (th1.y-th2.y)^2
+  |> sqrt
 
 
 minDistance : Cir a -> Cir a -> Float
