@@ -43,8 +43,8 @@ input =
   ( Signal.map5
     ( \ x y w h { diffSpeed, diffAngle } ->
       Just
-        { x = toFloat x
-        , y = toFloat y
+        { x = toFloat x - toFloat w / 2
+        , y = toFloat h / 2 - toFloat y
         , diffSpeed = diffSpeed
         , diffAngle = diffAngle
         , windowWidth = w
