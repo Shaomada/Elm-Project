@@ -30,18 +30,18 @@ gameUpdate ({ timePassed } as input ) (({ player, things }) as model) =
 updateSpeed : GameInput a -> Positioned b -> Thing -> Thing
 updateSpeed i player thing =
     case thing.speedId of
-        FollowMouse -> follow i thing
-        FollowPlayer -> follow player thing
+        FollowMouse -> follow i thing.speedCap thing
+        FollowPlayer -> follow player thing.speedCap thing
         Static -> thing
 
-follow : Positioned a -> Positioned( InMotion( b ) ) -> Positioned( InMotion( b ) )
-follow {x, y} moving =
+follow : Positioned a -> Float -> Positioned( InMotion( b ) ) -> Positioned( InMotion( b ) )
+follow {x, y} speedCap moving =
     let
         (distance, angle) = toPolar (x-moving.x, y-moving.y)
     in
         { moving
             | angle = angle
-            , speed = min distance 20
+            , speed = speedCap
         }
 
 
