@@ -15,6 +15,7 @@ type CollitionId = NoCollition
 type alias Updateable a =
   { a
       | speedId : UpdateSpeedId
+      , speedCap : Float
       , collitionId : CollitionId
   }
 
