@@ -74,7 +74,7 @@ input =
         ( \ (t, a) ->
           { a | timePassed =
             mtold
-            |> Maybe.map ( \told -> t - told )
+            |> Maybe.map ( \told -> Time.inSeconds (t - told) )
             |> Maybe.withDefault 0
           }
         )
