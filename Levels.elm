@@ -30,10 +30,10 @@ initial =
       }
     , { angle = 0
       , x = 500
-      , y = 400
+      , y = 350
       , radius = 50
       , speed = 0
-      , speedCap = 50
+      , speedCap = 10
       , color = Color.red
       , inpId = G.Ignore
       , intId = G.Enemy
