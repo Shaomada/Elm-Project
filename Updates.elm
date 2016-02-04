@@ -1,6 +1,7 @@
 module Updates (..) where
 
 import List
+import Color
 
 import GameTypes exposing (..)
 
@@ -94,8 +95,32 @@ onInteraction that this =
   case this.intId of
     Enemy -> case that.intId of
       Player -> {this | movId = MoveTowards {x = that.x, y = that.y} }
-      _ -> this
-    _ -> this
+      Bouncy -> onTouch moveOutOff that this
+      Enemy -> this
+    Player -> case that.intId of
+      Player -> this
+      Bouncy -> onTouch moveOutOff that this
+      Enemy -> onTouch (\ _ t -> {t | color = Color.black} ) that this
+    Bouncy -> this
+
+
+onTouch : (Thing -> Thing -> Thing) -> Thing -> Thing -> Thing
+onTouch f that this =
+  if touching that this
+  then f that this
+  else this
+
+
+moveOutOff : Thing -> Thing -> Thing
+moveOutOff that this =
+  let
+    (distance, angle) = toPolar (this.x-that.x, this.y-that.y)
+    (x, y) = fromPolar (max distance <| minDistance that this, angle)
+  in
+    { this
+        | x = that.x + x
+        , y = that.y + y
+    }
 
 
 distance : Pos a -> Pos a -> Float
