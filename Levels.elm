@@ -11,8 +11,9 @@ initial =
     , y = 0
     , radius = 30
     , speed = 1
-    , sId = Color.blue
-    , uId = G.UpdateId 0
+    , showId = Color.blue
+    , updateSpeedId = G.FollowMouse
+    , updateCollitionId = G.NoCollition
     }
   , things = []
   , windowWidth = 1200
