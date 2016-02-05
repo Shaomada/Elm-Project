@@ -1,46 +1,16 @@
 module Levels (..) where
 
-import GameTypes as G
-import Color
+import GameTypes
+import Things
 
 
-initial : G.Model
+initial : GameTypes.Model
 initial =
     { things =
-        [ { angle = 0
-          , x = 0
-          , y = 0
-          , radius = 30
-          , speed = 0
-          , speedCap = 30
-          , color = Color.blue
-          , inpId = G.FollowMouse '1'
-          , intId = G.Player
-          , movId = G.Move
-          }
-        , { angle = 0
-          , x = 300
-          , y = 0
-          , radius = 10
-          , speed = 0
-          , speedCap = 20
-          , color = Color.green
-          , inpId = G.Ignore
-          , intId = G.Bouncy
-          , movId = G.Move
-          }
-        , { angle = 0
-          , x = 500
-          , y = 350
-          , radius = 50
-          , speed = 0
-          , speedCap = 10
-          , color = Color.red
-          , inpId = G.Ignore
-          , intId = G.Enemy
-          , movId = G.Move
-          }
+        [ Things.player '1' {x = 0, y = 0} 
+        , Things.bouncy {x = 300, y = 0}
+        , Things.enemy {x = 500, y = 350}
         ]
-    , windowWidth = 1200
-    , windowHeight = 800
+    , windowWidth = 0
+    , windowHeight = 0
     }
