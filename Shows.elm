@@ -6,16 +6,16 @@ import Graphics.Element exposing (Element)
 
 show : G.Model -> Element
 show {things, windowHeight, windowWidth} =
-  List.map showThing things
+  List.concatMap showThing things
   |> Graphics.Collage.collage windowWidth windowHeight
       
 
-showThing : G.Thing -> Form
+showThing : G.Thing -> List Form
 showThing thing =
   [ showBody thing
   , showPath thing
   ]
-  |> Graphics.Collage.group
+
 
 showBody : G.Thing -> Form
 showBody thing =
