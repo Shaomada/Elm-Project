@@ -41,8 +41,14 @@ isDown c {keysDown} = Set.member c keysDown
 handleInput : GInp a -> Thing -> Thing
 handleInput input thing =
     case thing.inpId of
-        FollowMouse -> { thing |
-            movId = MoveTowards {x = input.x, y = input.y} }
+        (FollowMouse c) ->
+          if isDown c input
+          then
+            { thing
+                  | movId = MoveTowards {x = input.x, y = input.y}
+            }
+          else
+            thing
         Ignore -> thing
 
 

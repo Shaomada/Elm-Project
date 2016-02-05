@@ -13,7 +13,7 @@ initial =
       , speed = 0
       , speedCap = 30
       , color = Color.blue
-      , inpId = G.FollowMouse
+      , inpId = G.FollowMouse '1'
       , intId = G.Player
       , movId = G.Move
       }

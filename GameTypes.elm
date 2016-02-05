@@ -7,7 +7,7 @@ import Set
 
 type InputHandlingId =
   Ignore
-  | FollowMouse
+  | FollowMouse Char
 
 
 type MoveId =
