@@ -3,30 +3,29 @@ module GameTypes (..) where
 import Color
 import Set
 
--- Thing
 
-type InputHandlingId =
-  Ignore
-  | FollowMouse Char
-
-
-type MoveId =
-  Move
-  | MoveTowards (Pos Emp)
+type InputHandlingId
+    = Ignore
+    | FollowMouse Char
 
 
-type InteractionId =
-    Player
+type MoveId
+    = Move
+    | MoveTowards (Pos Emp)
+
+
+type InteractionId
+    = Player
     | Enemy
     | Bouncy
 
 
 type alias Meta =
-  { inpId : InputHandlingId
-  , intId : InteractionId
-  , movId : MoveId
-  , speedCap : Float
-  }
+    { inpId : InputHandlingId
+    , intId : InteractionId
+    , movId : MoveId
+    , speedCap : Float
+    }
 
 
 type alias Pos a =
@@ -48,12 +47,14 @@ type alias Cir a =
 
 
 type alias Col a =
-  { a
-      | color : Color.Color
-  }
+    { a
+        | color : Color.Color
+    }
 
-    
-type alias Thing = Col (Cir (Mot (Pos Meta) ) )
+
+type alias Thing =
+    Col (Cir (Mot (Pos Meta)))
+
 
 
 --
@@ -61,24 +62,23 @@ type alias Thing = Col (Cir (Mot (Pos Meta) ) )
 
 type alias Emp =
     {}
- 
+
 
 type alias Win a =
-  { a
-      | windowHeight : Int
-      , windowWidth : Int
-  }
-
-
-type alias GMod b =
-    { b | things : List Thing
+    { a
+        | windowHeight : Int
+        , windowWidth : Int
     }
 
 
-type alias Model = Win (GMod ( Emp ) )
+type alias GMod b =
+    { b
+        | things : List Thing
+    }
 
 
--- Input
+type alias Model =
+    Win (GMod Emp)
 
 
 type alias Tim a =
@@ -89,7 +89,9 @@ type alias Key a =
     { a | keysDown : Set.Set Char }
 
 
-type alias GInp a = Tim (Pos (Key a) )
+type alias GInp a =
+    Tim (Pos (Key a))
 
 
-type alias Input = Win (GInp Emp)
+type alias Input =
+    Win (GInp Emp)
