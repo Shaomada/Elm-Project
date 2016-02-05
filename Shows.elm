@@ -9,16 +9,12 @@ import GameTypes as G
 
 show : G.Model -> Element
 show { things, windowHeight, windowWidth } =
-    List.concatMap showThing things
-        |> Graphics.Collage.collage windowWidth windowHeight
-
-
-showThing : G.Thing -> List Form
-showThing thing =
-    [ showBody thing
-    , showPath thing
-    , showKey thing
+    [ List.map showBody things
+    , List.map showPath things
+    , List.map showKey things
     ]
+        |> List.concat
+        |> Graphics.Collage.collage windowWidth windowHeight
 
 
 showBody : G.Thing -> Form
