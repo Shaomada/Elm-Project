@@ -12,43 +12,6 @@ import Debug
 import GameTypes exposing (..)
 
 
-keysParsed : Signal (Mot Emp)
-keysParsed =
-    Signal.map
-        (\keysDown ->
-            let
-                forward : Float
-                forward =
-                    if Set.member (Char.toCode 'V') keysDown then
-                        1
-                    else
-                        0
-
-                backward =
-                    if Set.member (Char.toCode 'I') keysDown then
-                        1
-                    else
-                        0
-
-                left =
-                    if Set.member (Char.toCode 'U') keysDown then
-                        1
-                    else
-                        0
-
-                right =
-                    if Set.member (Char.toCode 'I') keysDown then
-                        1
-                    else
-                        0
-            in
-                { speed = forward - backward
-                , angle = left - right
-                }
-        )
-        Keyboard.keysDown
-
-
 input : Signal (Maybe Input)
 input =
     (Signal.map5
