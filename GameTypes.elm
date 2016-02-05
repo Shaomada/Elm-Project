@@ -1,6 +1,7 @@
 module GameTypes (..) where
 
 import Color
+import Set
 
 -- Thing
 
@@ -84,7 +85,11 @@ type alias Tim a =
     { a | timePassed : Float }
 
 
-type alias GInp a = Tim (Pos (Mot a) )
+type alias Key a =
+    { a | keysDown : Set.Set Char }
+
+
+type alias GInp a = Tim (Pos (Key a) )
 
 
 type alias Input = Win (GInp Emp)

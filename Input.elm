@@ -42,12 +42,11 @@ keysParsed = Signal.map
 input : Signal( Maybe Input )
 input =
   ( Signal.map5
-    ( \ x y w h { speed, angle } ->
+    ( \ x y w h k->
       Just
         { x = toFloat x - toFloat w / 2
         , y = toFloat h / 2 - toFloat y
-        , speed = speed
-        , angle = angle
+        , keysDown = Set.map Char.fromCode k
         , windowWidth = w
         , windowHeight = h
         , timePassed = Nothing
@@ -57,7 +56,7 @@ input =
     Mouse.y
     Window.width
     Window.height
-    keysParsed
+    Keyboard.keysDown
   )
   |> Signal.sampleOn (Time.fps 60)
   |> Time.timestamp
