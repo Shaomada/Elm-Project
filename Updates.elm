@@ -1,6 +1,7 @@
 module Updates (..) where
 
 import List
+import Set
 import Color
 
 import GameTypes exposing (..)
@@ -21,11 +22,20 @@ gameUpdate : GInp a -> GMod b -> GMod b
 gameUpdate input model =
     { model
         | things =
-            model.things
-            |> List.map (handleInput input)
-            |> List.map (move input)
-            |> interaction
+            if isDown ' ' input
+            then
+              model.things
+              |> List.map (handleInput input)
+              |> List.map (move input)
+              |> interaction
+            else
+              model.things
+              |> List.map (handleInput input)
     }
+
+
+isDown : Char -> Key a -> Bool
+isDown c {keysDown} = Set.member c keysDown
 
 
 handleInput : GInp a -> Thing -> Thing
