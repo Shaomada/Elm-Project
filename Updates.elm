@@ -97,7 +97,10 @@ interaction list =
   |> fst
 
 
-interact : Thing -> Thing -> Thing
+type alias F = Thing -> Thing -> Thing
+
+
+interact : F
 interact that this =
   case this.intId of
     Enemy -> case that.intId of
@@ -108,17 +111,24 @@ interact that this =
       Player -> this
       Bouncy -> onTouch moveOutOff that this
       Enemy -> onTouch (\ _ t -> {t | color = Color.black} ) that this
-    Bouncy -> this
+    Bouncy -> case that.intId of
+      Player -> onTouch (combine moveOutOff getPushedBy) that this
+      Bouncy -> onTouch moveOutOff that this
+      Enemy -> this
 
 
-onTouch : (Thing -> Thing -> Thing) -> Thing -> Thing -> Thing
+combine : F -> F -> F
+combine f g that = f that << g that
+
+
+onTouch : F -> F
 onTouch f that this =
   if touching that this
   then f that this
   else this
 
 
-moveOutOff : Thing -> Thing -> Thing
+moveOutOff : F
 moveOutOff that this =
   let
     (distance, angle) = toPolar (this.x-that.x, this.y-that.y)
@@ -128,6 +138,15 @@ moveOutOff that this =
         | x = that.x + x
         , y = that.y + y
     }
+
+
+getPushedBy : F
+getPushedBy that this =
+  let
+    (_, angle) = toPolar (this.x-that.x, this.y-that.y)
+    (x, y) = fromPolar (300, angle)
+  in
+    { this | movId = MoveTowards {x = this.x + x, y = this.y + y} }
 
 
 distance : Pos a -> Pos a -> Float
