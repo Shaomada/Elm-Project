@@ -27,10 +27,16 @@ map6 =
     mapOneMore Signal.map5
 
 
+map7 : (a -> b -> c -> d -> e -> f -> g -> h) ->
+    Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f ->
+    Signal g -> Signal h
+map7 = mapOneMore map6
+
+
 input : Signal (Maybe Input)
 input =
-    (map6
-        (\x y w h k d->
+    (map7
+        (\x y w h k d _ ->
             Just
                 { x = toFloat x - toFloat w / 2
                 , y = toFloat h / 2 - toFloat y
@@ -46,8 +52,8 @@ input =
         Window.height
         Keyboard.keysDown
         Mouse.isDown
+        (Time.fps 60)
     )
-        |> Signal.sampleOn (Time.fps 60)
         |> Time.timestamp
         |> Signal.map
             (\( t, ma ) ->
