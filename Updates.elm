@@ -25,7 +25,7 @@ gameUpdate : GInp a -> GMod b -> GMod b
 gameUpdate input model =
     { model
         | things =
-            if isDown ' ' input then
+            if input.isDown then
                 model.things
                     |> List.map (handleInput input)
                     |> List.map (move input)
