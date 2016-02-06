@@ -12,10 +12,25 @@ import Debug
 import GameTypes exposing (..)
 
 
+type alias SignalMap a x y = (a -> x) -> Signal a -> y
+
+
+mapOneMore : SignalMap (a, b) x y -> (a -> b -> x) -> Signal a -> Signal b -> y
+mapOneMore map f sa sb =
+    map (\(a, b) -> f a b) (Signal.map2 (,) sa sb)
+
+
+map6 : (a -> b -> c -> d -> e -> f -> g) ->
+    Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f ->
+    Signal g
+map6 =
+    mapOneMore Signal.map5
+
+
 input : Signal (Maybe Input)
 input =
-    (Signal.map5
-        (\x y w h k ->
+    (map6
+        (\x y w h k d->
             Just
                 { x = toFloat x - toFloat w / 2
                 , y = toFloat h / 2 - toFloat y
@@ -30,6 +45,7 @@ input =
         Window.width
         Window.height
         Keyboard.keysDown
+        Mouse.isDown
     )
         |> Signal.sampleOn (Time.fps 60)
         |> Time.timestamp
