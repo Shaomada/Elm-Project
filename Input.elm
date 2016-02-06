@@ -43,7 +43,7 @@ input =
                 , keysDown = Set.map Char.fromCode k
                 , windowWidth = w
                 , windowHeight = h
-                , timePassed = Nothing
+                , timePassed = 0
                 }
         )
         Mouse.x
@@ -73,7 +73,6 @@ input =
                                     mtold
                                         |> Maybe.map (\told -> Time.inSeconds (t - told))
                                         |> Maybe.withDefault 0
-                                        |> Debug.watch "time Passed"
                             }
                         )
             )
