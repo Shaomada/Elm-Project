@@ -54,6 +54,7 @@ type alias Cir a =
 type alias Col a =
     { a
         | color : Color.Color
+        , alpha : Float
     }
 
 

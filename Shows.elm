@@ -21,6 +21,7 @@ showBody : G.Thing -> Form
 showBody thing =
     Graphics.Collage.circle thing.radius
         |> Graphics.Collage.filled thing.color
+        |> Graphics.Collage.alpha thing.alpha
         |> Graphics.Collage.move ( thing.x, thing.y )
 
 
