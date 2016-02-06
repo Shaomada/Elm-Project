@@ -17,6 +17,7 @@ player c {x, y} =
     , movId = Move
     }
 
+
 bouncy : Pos a -> Thing
 bouncy {x, y} =
     { angle = 0

@@ -11,15 +11,48 @@ update : Maybe Input -> Model -> Model
 update minput model =
     case minput of
         Just input ->
-            gameUpdate
-                (Debug.watch "input" input)
-                { model
-                    | windowHeight = input.windowHeight
-                    , windowWidth = input.windowWidth
-                }
+            { model
+                | windowHeight = input.windowHeight
+                , windowWidth = input.windowWidth
+            }
+                |> (gameUpdate input)
+                |> (smartScroll input)
 
         Nothing ->
             model
+
+
+smartScroll input = scroll
+  { x
+      = (min 0 <| toFloat input.windowWidth / 2 - 100 - input.x)
+      - (min 0 <| toFloat input.windowWidth / 2 - 100 + input.x)
+          |> \ x -> input.timePassed * x
+  , y
+      = (min 0 <| toFloat input.windowHeight / 2 - 100 - input.y)
+      - (min 0 <| toFloat input.windowHeight / 2 - 100 + input.y)
+          |> \ y -> input.timePassed * y
+  }
+
+
+scroll : Pos a -> Model -> Model
+scroll {x, y} model =
+    { model
+        | things = List.map
+            (\thing ->
+                { thing
+                    | x = thing.x + x
+                    , y = thing.y + y
+                    , movId = case thing.movId of
+                        Move -> Move
+                        MoveTowards pos -> MoveTowards
+                            { pos
+                                | x = pos.x + x
+                                , y = pos.y + y
+                            }
+                }
+            )
+            model.things
+    }
 
 
 gameUpdate : GInp a -> GMod b -> GMod b
