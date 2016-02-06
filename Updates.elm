@@ -256,7 +256,15 @@ onTouch f that this =
         this
 
 
-dieFrom : Thing -> Thing -> Thing
+onWithin : F -> F
+onWithin f that this =
+    if isWithin that this then
+        f that this
+    else
+        this
+
+
+dieFrom : F
 dieFrom _ this =
     Things.die this
 
@@ -266,7 +274,7 @@ moveOutOff that this =
     let
         ( distance, angle ) = toPolar ( this.x - that.x, this.y - that.y )
 
-        ( x, y ) = fromPolar ( max distance <| minDistance that this, angle )
+        ( x, y ) = fromPolar ( max distance <| that.radius + this.radius, angle )
     in
         { this
             | x = that.x + x
@@ -285,19 +293,19 @@ getPushedBy that this =
 
 
 distance : Pos a -> Pos a -> Float
-distance th1 th2 =
-    (th1.x - th2.x)
+distance that this =
+    (that.x - this.x)
         ^ 2
-        + (th1.y - th2.y)
+        + (that.y - this.y)
         ^ 2
         |> sqrt
 
 
-minDistance : Cir a -> Cir a -> Float
-minDistance th1 th2 =
-    th1.radius + th2.radius
-
-
 touching : Pos (Cir a) -> Pos (Cir a) -> Bool
-touching th1 th2 =
-    distance th1 th2 <= minDistance th1 th2
+touching that this =
+    distance that this <= that.radius + this.radius
+
+
+isWithin : Pos (Cir a) -> Pos (Cir a) -> Bool
+isWithin that this =
+    distance that this < that.radius - this.radius
