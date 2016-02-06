@@ -1,7 +1,7 @@
 module Things where
 
 import GameTypes exposing (..)
-import Color exposing (blue, red, green)
+import Color exposing (blue, red, green, black)
 
 player : Char -> Pos a -> Thing
 player c {x, y} =
@@ -44,4 +44,16 @@ enemy {x, y} =
     , inpId = Ignore
     , intId = Enemy {distance = Nothing}
     , movId = Move
+    }
+
+
+die : Thing -> Thing
+die thing =
+    { thing
+        | speed = 0
+        , speedCap = 0
+        , color = black
+        , inpId = Ignore
+        , intId = Dead {}
+        , movId = Move
     }

@@ -4,6 +4,7 @@ import List
 import Set
 import Color
 import GameTypes exposing (..)
+import Things
 
 
 update : Maybe Input -> Model -> Model
@@ -152,6 +153,7 @@ interact that this =
                 (Enemy _) ->
                     onTouch moveOutOff that this
 
+                _ -> this
         (Player _) ->
             case that.intId of
                 (Player _) ->
@@ -161,7 +163,9 @@ interact that this =
                     onTouch moveOutOff that this
 
                 (Enemy _) ->
-                    onTouch (\_ t -> { t | color = Color.black }) that this
+                    onTouch dieFrom that this
+                
+                _ -> this
 
         (Bouncy _) ->
             case that.intId of
@@ -173,6 +177,10 @@ interact that this =
 
                 (Enemy _) ->
                     this
+                
+                _ -> this
+
+        _ -> this
 
 
 combine : F -> F -> F
@@ -186,6 +194,11 @@ onTouch f that this =
         f that this
     else
         this
+
+
+dieFrom : Thing -> Thing -> Thing
+dieFrom _ this =
+    Things.die this
 
 
 moveOutOff : F

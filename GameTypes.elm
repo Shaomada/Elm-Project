@@ -21,6 +21,8 @@ type InteractionId
         {distance : Maybe Float}
     | Bouncy
         {}
+    | Dead
+        {}
 
 
 type alias Meta =
