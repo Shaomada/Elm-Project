@@ -13,7 +13,7 @@ player c {x, y} =
     , speedCap = 70
     , color = blue
     , inpId = FollowMouse c
-    , intId = Player
+    , intId = Player {}
     , movId = Move
     }
 
@@ -27,7 +27,7 @@ bouncy {x, y} =
     , speedCap = 60
     , color = green
     , inpId = Ignore
-    , intId = Bouncy
+    , intId = Bouncy {}
     , movId = Move
     }
 
@@ -42,6 +42,6 @@ enemy {x, y} =
     , speedCap = 45
     , color = red
     , inpId = Ignore
-    , intId = Enemy
+    , intId = Enemy {distance = Nothing}
     , movId = Move
     }

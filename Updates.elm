@@ -27,6 +27,7 @@ gameUpdate input model =
         | things =
             if input.isDown then
                 model.things
+                    |> List.map tick
                     |> List.map (handleInput input)
                     |> List.map (move input)
                     |> interaction
@@ -34,6 +35,13 @@ gameUpdate input model =
                 model.things
                     |> List.map (handleInput input)
     }
+
+
+tick : Thing -> Thing
+tick thing =
+    case thing.intId of
+        (Enemy _) -> {thing | intId = Enemy {distance = Nothing} }
+        _ -> thing
 
 
 isDown : Char -> Key a -> Bool
@@ -117,37 +125,53 @@ type alias F =
 interact : F
 interact that this =
     case this.intId of
-        Enemy ->
+        (Enemy dataThis) ->
             case that.intId of
-                Player ->
-                    { this | movId = MoveTowards { x = that.x, y = that.y } }
+                (Player _) ->
+                    if
+                        dataThis.distance
+                            |> Maybe.map (\d -> d > distance that this)
+                            |> Maybe.withDefault True
+                    then
+                        { this
+                            | movId = MoveTowards
+                                { x = that.x
+                                , y = that.y
+                                }
+                            , intId = Enemy
+                                { distance = Just <| distance that this
+                                }
+                        }
+                    else
+                        this
+                    
 
-                Bouncy ->
+                (Bouncy _) ->
                     onTouch moveOutOff that this
 
-                Enemy ->
+                (Enemy _) ->
                     onTouch moveOutOff that this
 
-        Player ->
+        (Player _) ->
             case that.intId of
-                Player ->
+                (Player _) ->
                     onTouch moveOutOff that this
 
-                Bouncy ->
+                (Bouncy _) ->
                     onTouch moveOutOff that this
 
-                Enemy ->
+                (Enemy _) ->
                     onTouch (\_ t -> { t | color = Color.black }) that this
 
-        Bouncy ->
+        (Bouncy _) ->
             case that.intId of
-                Player ->
+                (Player _) ->
                     onTouch (combine moveOutOff getPushedBy) that this
 
-                Bouncy ->
+                (Bouncy _) ->
                     onTouch moveOutOff that this
 
-                Enemy ->
+                (Enemy _) ->
                     this
 
 

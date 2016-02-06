@@ -16,8 +16,11 @@ type MoveId
 
 type InteractionId
     = Player
+        {}
     | Enemy
+        {distance : Maybe Float}
     | Bouncy
+        {}
 
 
 type alias Meta =
