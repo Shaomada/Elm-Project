@@ -126,12 +126,12 @@ interact that this =
                     onTouch moveOutOff that this
 
                 Enemy ->
-                    this
+                    onTouch moveOutOff that this
 
         Player ->
             case that.intId of
                 Player ->
-                    this
+                    onTouch moveOutOff that this
 
                 Bouncy ->
                     onTouch moveOutOff that this
