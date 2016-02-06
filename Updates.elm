@@ -16,13 +16,15 @@ update minput model =
                 , windowWidth = input.windowWidth
             }
                 |> (gameUpdate input)
-                |> (smartScroll input)
+                |> (autoScroll input)
+                |> (manualScroll input)
 
         Nothing ->
             model
 
 
-smartScroll input = scroll
+autoScroll : Input -> Model -> Model
+autoScroll input = scroll
   { x
       = (min 0 <| toFloat input.windowWidth / 2 - 100 - input.x)
       - (min 0 <| toFloat input.windowWidth / 2 - 100 + input.x)
@@ -32,6 +34,31 @@ smartScroll input = scroll
       - (min 0 <| toFloat input.windowHeight / 2 - 100 + input.y)
           |> \ y -> input.timePassed * y
   }
+
+
+manualScroll : Input -> Model -> Model
+manualScroll input model =
+    scroll
+         ( searchActive input model.things
+             |> Maybe.map (\ {x, y} -> {x = -x, y = -y} )
+             |> Maybe.withDefault {x = 0, y = 0}
+         )
+         model
+
+
+searchActive input list =
+    case list of
+        (thing :: things) ->
+            case thing.inpId of
+                (FollowMouse c) ->
+                    if
+                        isDown c input
+                    then
+                        Just thing
+                    else
+                        searchActive input things
+                _ -> searchActive input things
+        [] -> Nothing
 
 
 scroll : Pos a -> Model -> Model
