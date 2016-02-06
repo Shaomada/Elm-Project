@@ -44,6 +44,7 @@ input =
                 , windowWidth = w
                 , windowHeight = h
                 , timePassed = 0
+                , isDown = d
                 }
         )
         Mouse.x

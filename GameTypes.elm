@@ -89,8 +89,12 @@ type alias Key a =
     { a | keysDown : Set.Set Char }
 
 
+type alias But a =
+    { a | isDown : Bool }
+
+
 type alias GInp a =
-    Tim (Pos (Key a))
+    Tim (Pos (Key( But a) ) )
 
 
 type alias Input =
