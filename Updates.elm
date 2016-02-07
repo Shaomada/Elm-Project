@@ -102,6 +102,7 @@ tick : Thing -> Thing
 tick thing =
     case thing.intId of
         (Enemy _) -> {thing | intId = Enemy {distance = Nothing} }
+        (Zone x) -> {thing | intId = Zone {x | done = False} }
         _ -> thing
 
 
@@ -240,7 +241,18 @@ interact that this =
                 
                 _ -> this
 
+        (Zone x) ->
+            onWithin (checkPattern x) that this
         _ -> this
+
+
+checkPattern x that this =
+    if
+        x.pattern that
+    then
+        { this | intId = Zone {x | done = True } }
+    else
+        this
 
 
 combine : F -> F -> F
@@ -303,9 +315,9 @@ distance that this =
 
 touching : Pos (Cir a) -> Pos (Cir a) -> Bool
 touching that this =
-    distance that this <= that.radius + this.radius
+    distance that this <= this.radius + that.radius
 
 
 isWithin : Pos (Cir a) -> Pos (Cir a) -> Bool
 isWithin that this =
-    distance that this < that.radius - this.radius
+    distance that this < this.radius - that.radius

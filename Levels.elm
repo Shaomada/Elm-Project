@@ -15,6 +15,7 @@ initial =
         , Things.enemy {x = 500, y = -350}
         , Things.enemy {x = -500, y = 350}
         , Things.enemy {x = -500, y = -350}
+        , Things.zonePlayer {x = 0, y = 200, radius = 100}
         ]
     , windowWidth = 0
     , windowHeight = 0

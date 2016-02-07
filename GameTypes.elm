@@ -23,6 +23,10 @@ type InteractionId
         {}
     | Dead
         {}
+    | Zone
+        { pattern : Thing -> Bool
+        , done : Bool
+        }
 
 
 type alias Meta =
