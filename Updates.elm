@@ -33,12 +33,17 @@ autoScroll input = scroll
 
 manualScroll : Input -> Model -> Model
 manualScroll input model =
-    scroll
-         ( searchActive input model.things
-             |> Maybe.map (\ {x, y} -> {x = -x, y = -y} )
-             |> Maybe.withDefault {x = 0, y = 0}
-         )
-         model
+    if
+        isDown ' ' input
+    then
+        scroll
+            ( searchActive input model.things
+                |> Maybe.map (\ {x, y} -> {x = -x, y = -y} )
+                |> Maybe.withDefault {x = 0, y = 0}
+            )
+            model
+    else
+        model
 
 
 searchActive input list =
