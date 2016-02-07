@@ -7,20 +7,15 @@ import GameTypes exposing (..)
 import Things
 
 
-update : Maybe Input -> Model -> Model
-update minput model =
-    case minput of
-        Just input ->
-            { model
-                | windowHeight = input.windowHeight
-                , windowWidth = input.windowWidth
-            }
-                |> (gameUpdate input)
-                |> (autoScroll input)
-                |> (manualScroll input)
-
-        Nothing ->
-            model
+update : Input -> Model -> Model
+update input model =
+        { model
+            | windowHeight = input.windowHeight
+            , windowWidth = input.windowWidth
+        }
+            |> (gameUpdate input)
+            |> (autoScroll input)
+            |> (manualScroll input)
 
 
 autoScroll : Input -> Model -> Model
