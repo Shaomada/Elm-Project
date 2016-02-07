@@ -5,16 +5,41 @@ import String
 import Graphics.Collage exposing (Form)
 import Graphics.Element exposing (Element)
 import GameTypes as G
-
+import Color
 
 show : G.Model -> Element
 show { things, windowHeight, windowWidth } =
-    [ List.map showBody things
+    [ List.map showBoundry things
+    , List.map showBody things
     , List.map showPath things
     , List.map showKey things
     ]
         |> List.concat
         |> Graphics.Collage.collage windowWidth windowHeight
+
+
+showBoundry : G.Thing -> Form
+showBoundry thing =
+    case thing.intId of
+        (G.Zone {done}) ->
+            if
+                done
+            then
+                Graphics.Collage.circle thing.radius
+                    |> Graphics.Collage.outlined
+                        (Graphics.Collage.solid thing.color)
+                    |> Graphics.Collage.move (thing.x, thing.y)
+            else
+                Graphics.Collage.circle thing.radius
+                    |> Graphics.Collage.outlined
+                        (Graphics.Collage.solid Color.lightGray)
+                    |> Graphics.Collage.move (thing.x, thing.y)
+        _ ->
+            Graphics.Collage.circle thing.radius
+                |> Graphics.Collage.outlined
+                    (Graphics.Collage.solid Color.black)
+                |> Graphics.Collage.alpha 0.7
+                |> Graphics.Collage.move ( thing.x, thing.y )
 
 
 showBody : G.Thing -> Form
