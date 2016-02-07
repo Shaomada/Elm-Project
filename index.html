@@ -6902,6 +6902,7 @@ Elm.GameTypes.make = function (_elm) {
    var _op = {};
    var Emp = {};
    var Meta = F4(function (a,b,c,d) {    return {inpId: a,intId: b,movId: c,speedCap: d};});
+   var Zone = function (a) {    return {ctor: "Zone",_0: a};};
    var Dead = function (a) {    return {ctor: "Dead",_0: a};};
    var Bouncy = function (a) {    return {ctor: "Bouncy",_0: a};};
    var Enemy = function (a) {    return {ctor: "Enemy",_0: a};};
@@ -6919,6 +6920,7 @@ Elm.GameTypes.make = function (_elm) {
                                   ,Enemy: Enemy
                                   ,Bouncy: Bouncy
                                   ,Dead: Dead
+                                  ,Zone: Zone
                                   ,Meta: Meta
                                   ,Emp: Emp};
 };Elm.Input = Elm.Input || {};
@@ -6941,43 +6943,51 @@ Elm.Input.make = function (_elm) {
    $Time = Elm.Time.make(_elm),
    $Window = Elm.Window.make(_elm);
    var _op = {};
+   var count = function (s) {    return A3($Signal.foldp,F2(function (_p0,n) {    return n + 1;}),0,s);};
    var mapOneMore = F4(function (map,f,sa,sb) {
       return A2(map,
-      function (_p0) {
-         var _p1 = _p0;
-         return A2(f,_p1._0,_p1._1);
+      function (_p1) {
+         var _p2 = _p1;
+         return A2(f,_p2._0,_p2._1);
       },
       A3($Signal.map2,F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),sa,sb));
    });
    var map6 = mapOneMore($Signal.map5);
    var map7 = mapOneMore(map6);
+   var map8 = mapOneMore(map7);
    var input = A2($Signal.map,
-   function (_p2) {
-      var _p3 = _p2;
-      return A2($Maybe.map,
-      function (_p4) {
-         var _p5 = _p4;
-         return _U.update(_p5._1,{timePassed: A2($Maybe.withDefault,0,A2($Maybe.map,function (told) {    return $Time.inSeconds(_p5._0 - told);},_p3._0))});
-      },
-      _p3._1);
+   function (_p3) {
+      var _p4 = _p3;
+      var _p7 = _p4._2;
+      var _p5 = _p4._1;
+      if (_p5.ctor === "Just") {
+            var _p6 = _p4._0;
+            if (_p6.ctor === "Just") {
+                  return _U.update(_p7,{timePassed: $Time.inSeconds(_p5._0 - _p6._0)});
+               } else {
+                  return _U.update(_p7,{x: 0,y: 0});
+               }
+         } else {
+            return _p7;
+         }
    },
    A3($Signal.foldp,
-   F2(function (mnew,_p6) {    var _p7 = _p6;return {ctor: "_Tuple2",_0: A2($Maybe.map,$Basics.fst,_p7._1),_1: mnew};}),
-   {ctor: "_Tuple2",_0: $Maybe.Nothing,_1: $Maybe.Nothing},
+   F2(function (_p9,_p8) {    var _p10 = _p9;var _p11 = _p8;return {ctor: "_Tuple3",_0: _p11._1,_1: _p10._0,_2: _p10._1};}),
+   {ctor: "_Tuple3",_0: $Maybe.Nothing,_1: $Maybe.Nothing,_2: {x: 0,y: 0,keysDown: $Set.empty,windowWidth: 0,windowHeight: 0,timePassed: 0,isDown: false}},
    A2($Signal.map,
-   function (_p8) {
-      var _p9 = _p8;
-      return A2($Maybe.map,function (a) {    return {ctor: "_Tuple2",_0: _p9._0,_1: a};},_p9._1);
+   function (_p12) {
+      var _p13 = _p12;
+      return {ctor: "_Tuple2",_0: $Maybe.Just(_p13._0),_1: _p13._1};
    },
-   $Time.timestamp(A8(map7,
-   F7(function (x,y,w,h,k,d,_p10) {
-      return $Maybe.Just({x: $Basics.toFloat(x) - $Basics.toFloat(w) / 2
-                         ,y: $Basics.toFloat(h) / 2 - $Basics.toFloat(y)
-                         ,keysDown: A2($Set.map,$Char.fromCode,k)
-                         ,windowWidth: w
-                         ,windowHeight: h
-                         ,timePassed: 0
-                         ,isDown: d});
+   $Time.timestamp(A9(map8,
+   F8(function (x,y,w,h,k,d,_p14,n) {
+      return {x: _U.cmp(n,0) > 0 ? $Basics.toFloat(x) - $Basics.toFloat(w) / 2 : 0
+             ,y: _U.cmp(n,0) > 0 ? $Basics.toFloat(h) / 2 - $Basics.toFloat(y) : 0
+             ,keysDown: A2($Set.map,$Char.fromCode,k)
+             ,windowWidth: w
+             ,windowHeight: h
+             ,timePassed: 0
+             ,isDown: d};
    }),
    $Mouse.x,
    $Mouse.y,
@@ -6985,8 +6995,9 @@ Elm.Input.make = function (_elm) {
    $Window.height,
    $Keyboard.keysDown,
    $Mouse.isDown,
-   $Time.fps(60))))));
-   return _elm.Input.values = {_op: _op,mapOneMore: mapOneMore,map6: map6,map7: map7,input: input};
+   $Time.fps(60),
+   count($Mouse.position))))));
+   return _elm.Input.values = {_op: _op,mapOneMore: mapOneMore,map6: map6,map7: map7,map8: map8,count: count,input: input};
 };Elm.Things = Elm.Things || {};
 Elm.Things.make = function (_elm) {
    "use strict";
@@ -7002,49 +7013,124 @@ Elm.Things.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var isDead = function (thing) {    var _p0 = thing.intId;if (_p0.ctor === "Dead") {    return true;} else {    return false;}};
+   var zoneDead = function (_p1) {
+      var _p2 = _p1;
+      return {angle: 0
+             ,x: _p2.x
+             ,y: _p2.y
+             ,radius: _p2.radius
+             ,speed: 0
+             ,speedCap: 0
+             ,color: $Color.black
+             ,alpha: 0.1
+             ,inpId: $GameTypes.Ignore
+             ,intId: $GameTypes.Zone({pattern: isDead,done: false})
+             ,movId: $GameTypes.Move};
+   };
    var die = function (thing) {
-      return _U.update(thing,{speed: 0,speedCap: 0,color: $Color.black,inpId: $GameTypes.Ignore,intId: $GameTypes.Dead({}),movId: $GameTypes.Move});
+      return _U.update(thing,{speed: 0,speedCap: 0,alpha: 0.4,inpId: $GameTypes.Ignore,intId: $GameTypes.Dead({}),movId: $GameTypes.Move});
    };
-   var enemy = function (_p0) {
-      var _p1 = _p0;
-      return {angle: 0
-             ,x: _p1.x
-             ,y: _p1.y
-             ,radius: 50
-             ,speed: 0
-             ,speedCap: 45
-             ,color: $Color.red
-             ,inpId: $GameTypes.Ignore
-             ,intId: $GameTypes.Enemy({distance: $Maybe.Nothing})
-             ,movId: $GameTypes.Move};
-   };
-   var bouncy = function (_p2) {
-      var _p3 = _p2;
-      return {angle: 0
-             ,x: _p3.x
-             ,y: _p3.y
-             ,radius: 20
-             ,speed: 0
-             ,speedCap: 60
-             ,color: $Color.green
-             ,inpId: $GameTypes.Ignore
-             ,intId: $GameTypes.Bouncy({})
-             ,movId: $GameTypes.Move};
-   };
-   var player = F2(function (c,_p4) {
+   var isEnemy = function (thing) {    var _p3 = thing.intId;if (_p3.ctor === "Enemy") {    return true;} else {    return false;}};
+   var zoneEnemy = function (_p4) {
       var _p5 = _p4;
       return {angle: 0
              ,x: _p5.x
              ,y: _p5.y
+             ,radius: _p5.radius
+             ,speed: 0
+             ,speedCap: 0
+             ,color: $Color.red
+             ,alpha: 0.1
+             ,inpId: $GameTypes.Ignore
+             ,intId: $GameTypes.Zone({pattern: isEnemy,done: false})
+             ,movId: $GameTypes.Move};
+   };
+   var enemy = function (_p6) {
+      var _p7 = _p6;
+      return {angle: 0
+             ,x: _p7.x
+             ,y: _p7.y
+             ,radius: 50
+             ,speed: 0
+             ,speedCap: 45
+             ,color: $Color.red
+             ,alpha: 0.8
+             ,inpId: $GameTypes.Ignore
+             ,intId: $GameTypes.Enemy({distance: $Maybe.Nothing})
+             ,movId: $GameTypes.Move};
+   };
+   var isBouncy = function (thing) {    var _p8 = thing.intId;if (_p8.ctor === "Bouncy") {    return true;} else {    return false;}};
+   var zoneBouncy = function (_p9) {
+      var _p10 = _p9;
+      return {angle: 0
+             ,x: _p10.x
+             ,y: _p10.y
+             ,radius: _p10.radius
+             ,speed: 0
+             ,speedCap: 0
+             ,color: $Color.green
+             ,alpha: 0.1
+             ,inpId: $GameTypes.Ignore
+             ,intId: $GameTypes.Zone({pattern: isBouncy,done: false})
+             ,movId: $GameTypes.Move};
+   };
+   var bouncy = function (_p11) {
+      var _p12 = _p11;
+      return {angle: 0
+             ,x: _p12.x
+             ,y: _p12.y
+             ,radius: 20
+             ,speed: 0
+             ,speedCap: 60
+             ,color: $Color.green
+             ,alpha: 0.9
+             ,inpId: $GameTypes.Ignore
+             ,intId: $GameTypes.Bouncy({})
+             ,movId: $GameTypes.Move};
+   };
+   var isPlayer = function (thing) {    var _p13 = thing.intId;if (_p13.ctor === "Player") {    return true;} else {    return false;}};
+   var zonePlayer = function (_p14) {
+      var _p15 = _p14;
+      return {angle: 0
+             ,x: _p15.x
+             ,y: _p15.y
+             ,radius: _p15.radius
+             ,speed: 0
+             ,speedCap: 0
+             ,color: $Color.blue
+             ,alpha: 0.1
+             ,inpId: $GameTypes.Ignore
+             ,intId: $GameTypes.Zone({pattern: isPlayer,done: false})
+             ,movId: $GameTypes.Move};
+   };
+   var player = F2(function (c,_p16) {
+      var _p17 = _p16;
+      return {angle: 0
+             ,x: _p17.x
+             ,y: _p17.y
              ,radius: 30
              ,speed: 0
              ,speedCap: 70
              ,color: $Color.blue
+             ,alpha: 0.9
              ,inpId: $GameTypes.FollowMouse(c)
              ,intId: $GameTypes.Player({})
              ,movId: $GameTypes.Move};
    });
-   return _elm.Things.values = {_op: _op,player: player,bouncy: bouncy,enemy: enemy,die: die};
+   return _elm.Things.values = {_op: _op
+                               ,player: player
+                               ,isPlayer: isPlayer
+                               ,zonePlayer: zonePlayer
+                               ,bouncy: bouncy
+                               ,isBouncy: isBouncy
+                               ,zoneBouncy: zoneBouncy
+                               ,enemy: enemy
+                               ,isEnemy: isEnemy
+                               ,zoneEnemy: zoneEnemy
+                               ,die: die
+                               ,isDead: isDead
+                               ,zoneDead: zoneDead};
 };Elm.Levels = Elm.Levels || {};
 Elm.Levels.make = function (_elm) {
    "use strict";
@@ -7067,9 +7153,11 @@ Elm.Levels.make = function (_elm) {
                                   ,$Things.enemy({x: 500,y: 350})
                                   ,$Things.enemy({x: 500,y: -350})
                                   ,$Things.enemy({x: -500,y: 350})
-                                  ,$Things.enemy({x: -500,y: -350})])
+                                  ,$Things.enemy({x: -500,y: -350})
+                                  ,$Things.zonePlayer({x: 0,y: 200,radius: 100})])
                  ,windowWidth: 0
-                 ,windowHeight: 0};
+                 ,windowHeight: 0
+                 ,won: false};
    return _elm.Levels.values = {_op: _op,initial: initial};
 };Elm.Updates = Elm.Updates || {};
 Elm.Updates.make = function (_elm) {
@@ -7087,9 +7175,9 @@ Elm.Updates.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Things = Elm.Things.make(_elm);
    var _op = {};
-   var minDistance = F2(function (th1,th2) {    return th1.radius + th2.radius;});
-   var distance = F2(function (th1,th2) {    return $Basics.sqrt(Math.pow(th1.x - th2.x,2) + Math.pow(th1.y - th2.y,2));});
-   var touching = F2(function (th1,th2) {    return _U.cmp(A2(distance,th1,th2),A2(minDistance,th1,th2)) < 1;});
+   var distance = F2(function (that,$this) {    return $Basics.sqrt(Math.pow(that.x - $this.x,2) + Math.pow(that.y - $this.y,2));});
+   var touching = F2(function (that,$this) {    return _U.cmp(A2(distance,that,$this),$this.radius + that.radius) < 1;});
+   var isWithin = F2(function (that,$this) {    return _U.cmp(A2(distance,that,$this),$this.radius - that.radius) < 0;});
    var getPushedBy = F2(function (that,$this) {
       var _p0 = $Basics.toPolar({ctor: "_Tuple2",_0: $this.x - that.x,_1: $this.y - that.y});
       var angle = _p0._1;
@@ -7102,14 +7190,16 @@ Elm.Updates.make = function (_elm) {
       var _p2 = $Basics.toPolar({ctor: "_Tuple2",_0: $this.x - that.x,_1: $this.y - that.y});
       var distance = _p2._0;
       var angle = _p2._1;
-      var _p3 = $Basics.fromPolar({ctor: "_Tuple2",_0: A2($Basics.max,distance,A2(minDistance,that,$this)),_1: angle});
+      var _p3 = $Basics.fromPolar({ctor: "_Tuple2",_0: A2($Basics.max,distance,that.radius + $this.radius),_1: angle});
       var x = _p3._0;
       var y = _p3._1;
       return _U.update($this,{x: that.x + x,y: that.y + y});
    });
    var dieFrom = F2(function (_p4,$this) {    return $Things.die($this);});
+   var onWithin = F3(function (f,that,$this) {    return A2(isWithin,that,$this) ? A2(f,that,$this) : $this;});
    var onTouch = F3(function (f,that,$this) {    return A2(touching,that,$this) ? A2(f,that,$this) : $this;});
    var combine = F3(function (f,g,that) {    return function (_p5) {    return A2(f,that,A2(g,that,_p5));};});
+   var checkPattern = F3(function (x,that,$this) {    return x.pattern(that) ? _U.update($this,{intId: $GameTypes.Zone(_U.update(x,{done: true}))}) : $this;});
    var interact = F2(function (that,$this) {
       var _p6 = $this.intId;
       switch (_p6.ctor)
@@ -7134,6 +7224,7 @@ Elm.Updates.make = function (_elm) {
               case "Bouncy": return A3(onTouch,moveOutOff,that,$this);
               case "Enemy": return $this;
               default: return $this;}
+         case "Zone": return A3(onWithin,checkPattern(_p6._0),that,$this);
          default: return $this;}
    });
    var interaction = function (list) {
@@ -7180,30 +7271,101 @@ Elm.Updates.make = function (_elm) {
    });
    var tick = function (thing) {
       var _p21 = thing.intId;
-      if (_p21.ctor === "Enemy") {
-            return _U.update(thing,{intId: $GameTypes.Enemy({distance: $Maybe.Nothing})});
-         } else {
-            return thing;
-         }
+      switch (_p21.ctor)
+      {case "Enemy": return _U.update(thing,{intId: $GameTypes.Enemy({distance: $Maybe.Nothing})});
+         case "Zone": return _U.update(thing,{intId: $GameTypes.Zone(_U.update(_p21._0,{done: false}))});
+         default: return thing;}
    };
+   var unDone = function (thing) {    var _p22 = thing.intId;if (_p22.ctor === "Zone") {    return $Basics.not(_p22._0.done);} else {    return false;}};
+   var won = function (model) {    return $Basics.not(A2($List.any,unDone,model.things));};
+   var checks = function (model) {    return _U.update(model,{won: won(model)});};
    var gameUpdate = F2(function (input,model) {
-      return _U.update(model,
+      return $Basics.not(model.won) ? checks(_U.update(model,
       {things: input.isDown ? interaction(A2($List.map,move(input),A2($List.map,handleInput(input),A2($List.map,tick,model.things)))) : A2($List.map,
       handleInput(input),
+      model.things)})) : model;
+   });
+   var scroll = F2(function (_p23,model) {
+      var _p24 = _p23;
+      var _p28 = _p24.y;
+      var _p27 = _p24.x;
+      return _U.update(model,
+      {things: A2($List.map,
+      function (thing) {
+         return _U.update(thing,
+         {x: thing.x + _p27
+         ,y: thing.y + _p28
+         ,movId: function () {
+            var _p25 = thing.movId;
+            if (_p25.ctor === "Move") {
+                  return $GameTypes.Move;
+               } else {
+                  var _p26 = _p25._0;
+                  return $GameTypes.MoveTowards(_U.update(_p26,{x: _p26.x + _p27,y: _p26.y + _p28}));
+               }
+         }()});
+      },
       model.things)});
    });
-   var update = F2(function (minput,model) {
-      var _p22 = minput;
-      if (_p22.ctor === "Just") {
-            var _p23 = _p22._0;
-            return A2(gameUpdate,A2($Debug.watch,"input",_p23),_U.update(model,{windowHeight: _p23.windowHeight,windowWidth: _p23.windowWidth}));
-         } else {
-            return model;
-         }
+   var searchActive = F2(function (input,list) {
+      searchActive: while (true) {
+         var _p29 = list;
+         if (_p29.ctor === "::") {
+               var _p32 = _p29._1;
+               var _p31 = _p29._0;
+               var _p30 = _p31.inpId;
+               if (_p30.ctor === "FollowMouse") {
+                     if (A2(isDown,_p30._0,input)) return $Maybe.Just(_p31); else {
+                           var _v15 = input,_v16 = _p32;
+                           input = _v15;
+                           list = _v16;
+                           continue searchActive;
+                        }
+                  } else {
+                     var _v17 = input,_v18 = _p32;
+                     input = _v17;
+                     list = _v18;
+                     continue searchActive;
+                  }
+            } else {
+               return $Maybe.Nothing;
+            }
+      }
+   });
+   var manualScroll = F2(function (input,model) {
+      return A2(isDown,_U.chr(" "),input) ? A2(scroll,
+      A2($Maybe.withDefault,
+      {x: 0,y: 0},
+      A2($Maybe.map,function (_p33) {    var _p34 = _p33;return {x: 0 - _p34.x,y: 0 - _p34.y};},A2(searchActive,input,model.things))),
+      model) : model;
+   });
+   var autoScroll = function (input) {
+      return scroll({x: function (x) {
+                       return input.timePassed * x;
+                    }(A2($Basics.min,0,$Basics.toFloat(input.windowWidth) / 2 - 100 - input.x) - A2($Basics.min,
+                    0,
+                    $Basics.toFloat(input.windowWidth) / 2 - 100 + input.x))
+                    ,y: function (y) {
+                       return input.timePassed * y;
+                    }(A2($Basics.min,0,$Basics.toFloat(input.windowHeight) / 2 - 100 - input.y) - A2($Basics.min,
+                    0,
+                    $Basics.toFloat(input.windowHeight) / 2 - 100 + input.y))});
+   };
+   var update = F2(function (input,model) {
+      return A2(manualScroll,
+      input,
+      A2(autoScroll,input,A2(gameUpdate,input,_U.update(model,{windowHeight: input.windowHeight,windowWidth: input.windowWidth}))));
    });
    return _elm.Updates.values = {_op: _op
                                 ,update: update
+                                ,autoScroll: autoScroll
+                                ,manualScroll: manualScroll
+                                ,searchActive: searchActive
+                                ,scroll: scroll
                                 ,gameUpdate: gameUpdate
+                                ,checks: checks
+                                ,won: won
+                                ,unDone: unDone
                                 ,tick: tick
                                 ,isDown: isDown
                                 ,handleInput: handleInput
@@ -7212,14 +7374,16 @@ Elm.Updates.make = function (_elm) {
                                 ,moveFor: moveFor
                                 ,interaction: interaction
                                 ,interact: interact
+                                ,checkPattern: checkPattern
                                 ,combine: combine
                                 ,onTouch: onTouch
+                                ,onWithin: onWithin
                                 ,dieFrom: dieFrom
                                 ,moveOutOff: moveOutOff
                                 ,getPushedBy: getPushedBy
                                 ,distance: distance
-                                ,minDistance: minDistance
-                                ,touching: touching};
+                                ,touching: touching
+                                ,isWithin: isWithin};
 };Elm.Shows = Elm.Shows || {};
 Elm.Shows.make = function (_elm) {
    "use strict";
@@ -7227,6 +7391,7 @@ Elm.Shows.make = function (_elm) {
    if (_elm.Shows.values) return _elm.Shows.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Color = Elm.Color.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $GameTypes = Elm.GameTypes.make(_elm),
    $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
@@ -7260,17 +7425,40 @@ Elm.Shows.make = function (_elm) {
    var showBody = function (thing) {
       return A2($Graphics$Collage.move,
       {ctor: "_Tuple2",_0: thing.x,_1: thing.y},
-      A2($Graphics$Collage.filled,thing.color,$Graphics$Collage.circle(thing.radius)));
+      A2($Graphics$Collage.alpha,thing.alpha,A2($Graphics$Collage.filled,thing.color,$Graphics$Collage.circle(thing.radius))));
    };
-   var show = function (_p3) {
-      var _p4 = _p3;
-      var _p5 = _p4.things;
+   var showBoundry = function (thing) {
+      var _p3 = thing.intId;
+      if (_p3.ctor === "Zone") {
+            return _p3._0.done ? A2($Graphics$Collage.move,
+            {ctor: "_Tuple2",_0: thing.x,_1: thing.y},
+            A2($Graphics$Collage.outlined,$Graphics$Collage.solid(thing.color),$Graphics$Collage.circle(thing.radius))) : A2($Graphics$Collage.move,
+            {ctor: "_Tuple2",_0: thing.x,_1: thing.y},
+            A2($Graphics$Collage.outlined,$Graphics$Collage.solid($Color.lightGray),$Graphics$Collage.circle(thing.radius)));
+         } else {
+            return A2($Graphics$Collage.move,
+            {ctor: "_Tuple2",_0: thing.x,_1: thing.y},
+            A2($Graphics$Collage.alpha,0.7,A2($Graphics$Collage.outlined,$Graphics$Collage.solid($Color.black),$Graphics$Collage.circle(thing.radius))));
+         }
+   };
+   var victory = function (won) {
+      return won ? function (x) {
+         return A2($List._op["::"],x,_U.list([]));
+      }(A2($Graphics$Collage.alpha,
+      0.8,
+      $Graphics$Collage.text(A2($Text.style,
+      {typeface: _U.list([]),height: $Maybe.Just(100),color: $Color.lightPurple,bold: true,italic: false,line: $Maybe.Nothing},
+      $Text.fromString("Victory"))))) : _U.list([]);
+   };
+   var show = function (_p4) {
+      var _p5 = _p4;
+      var _p6 = _p5.things;
       return A3($Graphics$Collage.collage,
-      _p4.windowWidth,
-      _p4.windowHeight,
-      $List.concat(_U.list([A2($List.map,showBody,_p5),A2($List.map,showPath,_p5),A2($List.map,showKey,_p5)])));
+      _p5.windowWidth,
+      _p5.windowHeight,
+      $List.concat(_U.list([A2($List.map,showBoundry,_p6),A2($List.map,showBody,_p6),A2($List.map,showPath,_p6),A2($List.map,showKey,_p6),victory(_p5.won)])));
    };
-   return _elm.Shows.values = {_op: _op,show: show,showBody: showBody,showPath: showPath,showKey: showKey};
+   return _elm.Shows.values = {_op: _op,show: show,victory: victory,showBoundry: showBoundry,showBody: showBody,showPath: showPath,showKey: showKey};
 };Elm.Main = Elm.Main || {};
 Elm.Main.make = function (_elm) {
    "use strict";
