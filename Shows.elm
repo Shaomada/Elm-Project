@@ -8,14 +8,37 @@ import GameTypes as G
 import Color
 
 show : G.Model -> Element
-show { things, windowHeight, windowWidth } =
-    [ List.map showBoundry things
-    , List.map showBody things
-    , List.map showPath things
-    , List.map showKey things
-    ]
-        |> List.concat
-        |> Graphics.Collage.collage windowWidth windowHeight
+show { things, windowHeight, windowWidth, won } =
+        [ List.map showBoundry things
+        , List.map showBody things
+        , List.map showPath things
+        , List.map showKey things
+        , victory won
+        ]
+            |> List.concat
+            |> Graphics.Collage.collage windowWidth windowHeight
+
+
+victory : Bool -> List Form
+victory won =
+    if
+        won
+    then
+        "Victory"
+            |> Text.fromString
+            |> Text.style
+                { typeface = []
+                , height = Just 100
+                , color = Color.lightPurple
+                , bold = True
+                , italic = False
+                , line = Nothing
+                }
+            |> Graphics.Collage.text
+            |> Graphics.Collage.alpha 0.8
+            |> (\x -> x::[])
+    else
+        []
 
 
 showBoundry : G.Thing -> Form

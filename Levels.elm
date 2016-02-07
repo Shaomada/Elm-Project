@@ -19,4 +19,5 @@ initial =
         ]
     , windowWidth = 0
     , windowHeight = 0
+    , won = False
     }

@@ -84,6 +84,7 @@ type alias Win a =
 type alias GMod b =
     { b
         | things : List Thing
+        , won : Bool
     }
 
 
@@ -101,7 +102,6 @@ type alias Key a =
 
 type alias But a =
     { a | isDown : Bool }
-
 
 type alias GInp a =
     Tim (Pos (Key( But a) ) )

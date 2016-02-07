@@ -9,13 +9,13 @@ import Things
 
 update : Input -> Model -> Model
 update input model =
-        { model
-            | windowHeight = input.windowHeight
-            , windowWidth = input.windowWidth
-        }
-            |> (gameUpdate input)
-            |> (autoScroll input)
-            |> (manualScroll input)
+    { model
+        | windowHeight = input.windowHeight
+        , windowWidth = input.windowWidth
+    }
+        |> (gameUpdate input)
+        |> (autoScroll input)
+        |> (manualScroll input)
 
 
 autoScroll : Input -> Model -> Model
@@ -84,18 +84,43 @@ scroll {x, y} model =
 
 gameUpdate : GInp a -> GMod b -> GMod b
 gameUpdate input model =
+    if
+        not model.won
+    then
+        { model
+            | things =
+                if input.isDown then
+                    model.things
+                        |> List.map tick
+                        |> List.map (handleInput input)
+                        |> List.map (move input)
+                        |> interaction
+                else
+                    model.things
+                        |> List.map (handleInput input)
+        }
+            |> checks
+    else
+        model
+
+
+checks : GMod a -> GMod a
+checks model =
     { model
-        | things =
-            if input.isDown then
-                model.things
-                    |> List.map tick
-                    |> List.map (handleInput input)
-                    |> List.map (move input)
-                    |> interaction
-            else
-                model.things
-                    |> List.map (handleInput input)
+        | won = won model
     }
+
+
+won : GMod a -> Bool
+won model =
+    not <| List.any unDone model.things
+
+
+unDone : Thing -> Bool
+unDone thing =
+    case thing.intId of
+        (Zone x) -> not x.done
+        _ -> False
 
 
 tick : Thing -> Thing
