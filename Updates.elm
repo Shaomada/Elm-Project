@@ -250,6 +250,9 @@ interact that this =
 
                 (Bouncy _) ->
                     onTouch moveOutOff that this
+                
+                (Block _) ->
+                    onTouch moveOutOff that this
 
                 (Enemy _) ->
                     onTouch moveOutOff that this
@@ -261,6 +264,9 @@ interact that this =
                     onTouch moveOutOff that this
 
                 (Bouncy _) ->
+                    onTouch moveOutOff that this
+                
+                (Block _) ->
                     onTouch moveOutOff that this
 
                 (Enemy _) ->
@@ -274,6 +280,9 @@ interact that this =
                     onTouch (combine moveOutOff getPushedBy) that this
 
                 (Bouncy _) ->
+                    onTouch moveOutOff that this
+                
+                (Block _) ->
                     onTouch moveOutOff that this
 
                 (Enemy _) ->

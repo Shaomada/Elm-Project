@@ -8,7 +8,7 @@ import Things
 
 initial : GameTypes.Model
 initial =
-    level 8 -- should be 0, I sometimes change this for testing
+    level 0 -- should be 0, I sometimes change this for testing
 
 
 level : Int -> GameTypes.Model
@@ -63,7 +63,7 @@ levelData =
       )
     , ( [ Things.player '1' {x = 0, y = 0}
         , Things.enemy {x = -200, y = 0}
-        , Things.bouncy {x = -100, y = 0}
+        , Things.block {x = -100, y = -1}
         , Things.zonePlayer {x = 1000, y = 0, radius = 55}
         ]
       , [ "Sometimes all you need to do is go right."
@@ -87,8 +87,8 @@ levelData =
     , ( [ Things.player '1' {x = 0, y = 0}
         , Things.zoneDead {x = 350, y = 0, radius = 50}
         , Things.enemy {x = -300, y = 0}
-        , Things.bouncy {x = -200, y =  50}
-        , Things.bouncy {x = -200, y = -50}
+        , Things.block {x = -200, y =  50}
+        , Things.block {x = -200, y = -50}
         ]
       , [ "Other things might or might not be less intuitive." ]
       )

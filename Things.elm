@@ -1,7 +1,7 @@
 module Things where
 
 import GameTypes exposing (..)
-import Color exposing (blue, red, green, black)
+import Color exposing (blue, red, green, black, yellow)
 
 player : Char -> Pos a -> Thing
 player c {x, y} =
@@ -166,5 +166,21 @@ zoneDead {x, y, radius} =
         { pattern = isDead
         , done = False
         }
+    , movId = Move
+    }
+
+
+block : Pos a -> Thing
+block {x, y} =
+    { angle = 0
+    , x = x
+    , y = y
+    , radius = 20
+    , speed = 0
+    , speedCap = 60
+    , color = yellow
+    , alpha = 0.9
+    , inpId = Ignore
+    , intId = Bouncy {}
     , movId = Move
     }
