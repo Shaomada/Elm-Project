@@ -24,7 +24,7 @@ victory won =
     if
         won
     then
-        "Victory"
+        [ "Victory"
             |> Text.fromString
             |> Text.style
                 { typeface = []
@@ -36,7 +36,20 @@ victory won =
                 }
             |> Graphics.Collage.text
             |> Graphics.Collage.alpha 0.8
-            |> (\x -> x::[])
+        , "Press n to proceed to the next Level"
+            |> Text.fromString
+            |> Text.style
+                { typeface = []
+                , height = Just 30
+                , color = Color.lightPurple
+                , bold = False
+                , italic = False
+                , line = Nothing
+                }
+            |> Graphics.Collage.text
+            |> Graphics.Collage.alpha 0.8
+            |> Graphics.Collage.move (0, -100)
+        ]
     else
         []
 

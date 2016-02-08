@@ -85,6 +85,7 @@ type alias GMod b =
     { b
         | things : List Thing
         , won : Bool
+        , level : Int
     }
 
 

@@ -5,6 +5,7 @@ import Set
 import Color
 import GameTypes exposing (..)
 import Things
+import Levels
 
 
 update : Input -> Model -> Model
@@ -16,7 +17,17 @@ update input model =
         |> (gameUpdate input)
         |> (autoScroll input)
         |> (manualScroll input)
+        |> (loadLevel input)
 
+
+loadLevel : Input -> Model -> Model
+loadLevel input model =
+    if
+        isDown 'N' input && model.won
+    then
+        Levels.level <| model.level + 1
+    else
+        model
 
 autoScroll : Input -> Model -> Model
 autoScroll input = scroll
