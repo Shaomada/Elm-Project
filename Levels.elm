@@ -51,6 +51,12 @@ levelData =
         , "Try to get into the blue Zone"
         ]
       )
+    , ( [ Things.player '1' {x = -200, y = 0}
+        , Things.enemy {x = 0, y = 0}
+        , Things.zonePlayer {x = 200, y = 0, radius = 35}
+        ]
+      , [ "You can reset a Level at any time by pressing 'R'" ]
+      )
     , ( [ Things.player '1' {x = -200, y = 50}
         , Things.bouncy {x = 200, y = 50}
         , Things.zonePlayer {x = 400, y = 50, radius = 40}
@@ -59,12 +65,6 @@ levelData =
       , [ "Some Things might need a push"
         , "to go where you want them to."
         ]
-      )
-    , ( [ Things.player '1' {x = -200, y = 0}
-        , Things.enemy {x = 0, y = 0}
-        , Things.zonePlayer {x = 200, y = 0, radius = 35}
-        ]
-      , [ "You can reset a Level at any time by pressing 'R'" ]
       )
     , ( [ Things.player '1' {x = 0, y = 0}
         , Things.enemy {x = -200, y = 0}
