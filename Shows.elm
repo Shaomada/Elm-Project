@@ -8,19 +8,19 @@ import GameTypes as G
 import Color
 
 show : G.Model -> Element
-show { things, windowHeight, windowWidth, won } =
+show { things, windowHeight, windowWidth, won, messages} =
         [ List.map showBoundry things
         , List.map showBody things
         , List.map showPath things
         , List.map showKey things
-        , victory won
+        , victory won messages
         ]
             |> List.concat
             |> Graphics.Collage.collage windowWidth windowHeight
 
 
-victory : Bool -> List Form
-victory won =
+victory : Bool -> List String -> List Form
+victory won messages =
     if
         won
     then
@@ -51,7 +51,23 @@ victory won =
             |> Graphics.Collage.move (0, -100)
         ]
     else
-        []
+        messages
+            |> List.indexedMap
+                (\ line message ->
+                    message
+                        |> Text.fromString
+                        |> Text.style
+                            { typeface = []
+                            , height = Just 30
+                            , color = Color.lightPurple
+                            , bold = False
+                            , italic = False
+                            , line = Nothing
+                            }
+                        |> Graphics.Collage.text
+                        |> Graphics.Collage.alpha 0.8
+                        |> Graphics.Collage.move (0, -40 * toFloat (3+line) )
+                )
 
 
 showBoundry : G.Thing -> Form

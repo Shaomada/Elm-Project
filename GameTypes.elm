@@ -86,6 +86,7 @@ type alias GMod b =
         | things : List Thing
         , won : Bool
         , level : Int
+        , messages : List String
     }
 
 

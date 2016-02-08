@@ -20,6 +20,7 @@ level n =
         , windowHeight = 0
         , won = False
         , level = 0
+        , messages = []
         }
 
 
@@ -31,8 +32,10 @@ levels = Array.fromList
         ]
       , windowHeight = 0
       , windowWidth = 0
-      , won = False,
-      level = 0
+      , won = False
+      , level = 0
+      , messages = [ "use '1' to set a target and the Left Mouse Button to move towards that target"
+                   , "try to get into the blue Zone"]
       }
     , { things =
           [ Things.player '2' {x = 0, y = 0}
@@ -49,5 +52,6 @@ levels = Array.fromList
       , windowHeight = 0
       , won = False
       , level = 1
+      , messages = [ "this is a testmessage" ]
       }
     ]
