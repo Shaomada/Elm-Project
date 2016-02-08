@@ -12,46 +12,53 @@ initial =
 
 
 level : Int -> GameTypes.Model
-level n =
-    Array.get n levels
+level i =
+    Array.get i levels
     |> Maybe.withDefault
-        { things = []
-        , windowWidth = 0
-        , windowHeight = 0
-        , won = False
-        , level = 0
-        , messages = []
-        }
+        ( createLevel i ([], ["Index out of range, loading empty Level"]))
 
 
 levels : Array.Array GameTypes.Model
-levels = Array.fromList
-    [ { things =
-        [ Things.player '1' {x = -200, y = 200}
+levels =
+    levelData
+        |> List.indexedMap createLevel
+        |> Array.fromList
+
+
+createLevel : Int -> (List GameTypes.Thing, List String) -> GameTypes.Model
+createLevel i (things, messages) =
+    { things = things
+    , windowWidth = 0
+    , windowHeight = 0
+    , won = False
+    , level = i
+    , messages = messages
+    }
+
+
+levelData : List (List GameTypes.Thing, List String)
+levelData =
+    [ ( [ Things.player '1' {x = -200, y = 200}
         , Things.zonePlayer {x = 200, y = 200, radius = 70}
         ]
-      , windowHeight = 0
-      , windowWidth = 0
-      , won = False
-      , level = 0
-      , messages = [ "use '1' to set a target and the Left Mouse Button to move towards that target"
-                   , "try to get into the blue Zone"]
-      }
-    , { things =
-          [ Things.player '2' {x = 0, y = 0}
-          , Things.player '3' {x = 100, y = 0}
-          , Things.player '1' {x = -100, y = 0}
-          , Things.bouncy {x = 300, y = 0}
-          , Things.enemy {x = 500, y = 350}
-          , Things.enemy {x = 500, y = -350}
-          , Things.enemy {x = -500, y = 350}
-          , Things.enemy {x = -500, y = -350}
-          , Things.zonePlayer {x = 0, y = 200, radius = 100}
-          ]
-      , windowWidth = 0
-      , windowHeight = 0
-      , won = False
-      , level = 1
-      , messages = [ "this is a testmessage" ]
-      }
+      , [ "Use '1' to set a target,"
+        , "then press a Mouse Button."
+        , "Try to get into the blue Zone"
+        ]
+      )
+    , ( [ Things.player '1' {x = -200, y = 100}
+        , Things.bouncy {x = 200, y = 100}
+        , Things.zonePlayer {x = 400, y = 100, radius = 70}
+        , Things.zoneBouncy {x = -400, y = 100, radius = 50}
+        ]
+      , [ "some Things might need a push"
+        , "to go where you want them to"
+        ]
+      )
+    , ( [ Things.zoneDead {x = 0, y = 0, radius = 0}
+        ]
+      , [ "Congratulations"
+        , "You completed all the Levels" 
+        ]
+      )
     ]
