@@ -8,8 +8,7 @@ import Things
 
 initial : GameTypes.Model
 initial =
-    level 0 -- should be 0, I sometimes change this for testing
-
+    level 0
 
 level : Int -> GameTypes.Model
 level i =
