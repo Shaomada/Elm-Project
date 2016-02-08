@@ -8078,7 +8078,7 @@ Elm.Things.make = function (_elm) {
              ,speed: 0
              ,speedCap: 0
              ,color: $Color.black
-             ,alpha: 0.1
+             ,alpha: 0.25
              ,inpId: $GameTypes.Ignore
              ,intId: $GameTypes.Zone({pattern: isDead,done: false})
              ,movId: $GameTypes.Move};
@@ -8096,7 +8096,7 @@ Elm.Things.make = function (_elm) {
              ,speed: 0
              ,speedCap: 0
              ,color: $Color.red
-             ,alpha: 0.1
+             ,alpha: 0.25
              ,inpId: $GameTypes.Ignore
              ,intId: $GameTypes.Zone({pattern: isEnemy,done: false})
              ,movId: $GameTypes.Move};
@@ -8125,7 +8125,7 @@ Elm.Things.make = function (_elm) {
              ,speed: 0
              ,speedCap: 0
              ,color: $Color.green
-             ,alpha: 0.1
+             ,alpha: 0.25
              ,inpId: $GameTypes.Ignore
              ,intId: $GameTypes.Zone({pattern: isBouncy,done: false})
              ,movId: $GameTypes.Move};
@@ -8154,7 +8154,7 @@ Elm.Things.make = function (_elm) {
              ,speed: 0
              ,speedCap: 0
              ,color: $Color.blue
-             ,alpha: 0.1
+             ,alpha: 0.25
              ,inpId: $GameTypes.Ignore
              ,intId: $GameTypes.Zone({pattern: isPlayer,done: false})
              ,movId: $GameTypes.Move};
@@ -8207,16 +8207,16 @@ Elm.Levels.make = function (_elm) {
                             ,_0: _U.list([A2($Things.player,_U.chr("1"),{x: -200,y: 100}),$Things.zonePlayer({x: 200,y: 100,radius: 50})])
                             ,_1: _U.list(["Use \'1\' to set a target,","then press a Mouse Button.","Try to get into the blue Zone"])}
                            ,{ctor: "_Tuple2"
+                            ,_0: _U.list([A2($Things.player,_U.chr("1"),{x: -200,y: 0})
+                                         ,$Things.enemy({x: 0,y: 0})
+                                         ,$Things.zonePlayer({x: 200,y: 0,radius: 35})])
+                            ,_1: _U.list(["You can reset a Level at any time by pressing \'R\'"])}
+                           ,{ctor: "_Tuple2"
                             ,_0: _U.list([A2($Things.player,_U.chr("1"),{x: -200,y: 50})
                                          ,$Things.bouncy({x: 200,y: 50})
                                          ,$Things.zonePlayer({x: 400,y: 50,radius: 40})
                                          ,$Things.zoneBouncy({x: -400,y: 50,radius: 40})])
                             ,_1: _U.list(["Some Things might need a push","to go where you want them to."])}
-                           ,{ctor: "_Tuple2"
-                            ,_0: _U.list([A2($Things.player,_U.chr("1"),{x: -200,y: 0})
-                                         ,$Things.enemy({x: 0,y: 0})
-                                         ,$Things.zonePlayer({x: 200,y: 0,radius: 35})])
-                            ,_1: _U.list(["You can reset a Level at any time by pressing \'R\'"])}
                            ,{ctor: "_Tuple2"
                             ,_0: _U.list([A2($Things.player,_U.chr("1"),{x: 0,y: 0})
                                          ,$Things.enemy({x: -200,y: 0})
