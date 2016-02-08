@@ -14,7 +14,13 @@ level : Int -> GameTypes.Model
 level i =
     Array.get i levels
     |> Maybe.withDefault
-        ( createLevel i ([], ["Index out of range, loading empty Level"]))
+        ( createLevel i
+            ( [ Things.zoneDead {x = 0, y = 0, radius = 0}
+              ]
+            , [ "Index out of range, loading unsolveable Level"
+              ]
+            )
+        )
 
 
 levels : Array.Array GameTypes.Model
@@ -58,7 +64,7 @@ levelData =
         , Things.enemy {x = 0, y = 0}
         , Things.zonePlayer {x = 200, y = 0, radius = 35}
         ]
-      , [ "You can reset a Level at anytime by pressing 'R'" ]
+      , [ "You can reset a Level at any time by pressing 'R'" ]
       )
     , ( [ Things.player '1' {x = 0, y = 0}
         , Things.enemy {x = -200, y = 0}
