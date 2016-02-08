@@ -12,7 +12,9 @@ import Input as I
 model : Signal G.Model
 model =
     Signal.foldp
-      U.update L.initial I.input
+        U.update
+        L.initial
+        I.input
 
 
 main : Signal Graphics.Element.Element

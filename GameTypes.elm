@@ -15,16 +15,11 @@ type MoveId
 
 
 type InteractionId
-    = Player
-        {}
-    | Enemy
-        {distance : Maybe Float}
-    | Bouncy
-        {}
-    | Block
-        {}
-    | Dead
-        {}
+    = Player {}
+    | Enemy { distance : Maybe Float }
+    | Bouncy {}
+    | Block {}
+    | Dead {}
     | Zone
         { pattern : Thing -> Bool
         , done : Bool
@@ -107,8 +102,9 @@ type alias Key a =
 type alias But a =
     { a | isDown : Bool }
 
+
 type alias GInp a =
-    Tim (Pos (Key( But a) ) )
+    Tim (Pos (Key (But a)))
 
 
 type alias Input =

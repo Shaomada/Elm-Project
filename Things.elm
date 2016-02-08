@@ -1,10 +1,11 @@
-module Things where
+module Things (..) where
 
 import GameTypes exposing (..)
 import Color exposing (blue, red, green, black, yellow)
 
+
 player : Char -> Pos a -> Thing
-player c {x, y} =
+player c { x, y } =
     { angle = 0
     , x = x
     , y = y
@@ -22,12 +23,15 @@ player c {x, y} =
 isPlayer : Thing -> Bool
 isPlayer thing =
     case thing.intId of
-        (Player _) -> True
-        _ -> False
+        Player _ ->
+            True
+
+        _ ->
+            False
 
 
 zonePlayer : Pos (Cir a) -> Thing
-zonePlayer {x, y, radius} =
+zonePlayer { x, y, radius } =
     { angle = 0
     , x = x
     , y = y
@@ -37,16 +41,17 @@ zonePlayer {x, y, radius} =
     , color = blue
     , alpha = 0.25
     , inpId = Ignore
-    , intId = Zone
-        { pattern = isPlayer
-        , done = False
-        }
+    , intId =
+        Zone
+            { pattern = isPlayer
+            , done = False
+            }
     , movId = Move
     }
 
 
 bouncy : Pos a -> Thing
-bouncy {x, y} =
+bouncy { x, y } =
     { angle = 0
     , x = x
     , y = y
@@ -64,12 +69,15 @@ bouncy {x, y} =
 isBouncy : Thing -> Bool
 isBouncy thing =
     case thing.intId of
-        (Bouncy _) -> True
-        _ -> False
+        Bouncy _ ->
+            True
+
+        _ ->
+            False
 
 
 zoneBouncy : Pos (Cir a) -> Thing
-zoneBouncy {x, y, radius} =
+zoneBouncy { x, y, radius } =
     { angle = 0
     , x = x
     , y = y
@@ -79,16 +87,17 @@ zoneBouncy {x, y, radius} =
     , color = green
     , alpha = 0.25
     , inpId = Ignore
-    , intId = Zone
-        { pattern = isBouncy
-        , done = False
-        }
+    , intId =
+        Zone
+            { pattern = isBouncy
+            , done = False
+            }
     , movId = Move
     }
 
 
 enemy : Pos a -> Thing
-enemy {x, y} =
+enemy { x, y } =
     { angle = 0
     , x = x
     , y = y
@@ -98,7 +107,7 @@ enemy {x, y} =
     , color = red
     , alpha = 0.8
     , inpId = Ignore
-    , intId = Enemy {distance = Nothing}
+    , intId = Enemy { distance = Nothing }
     , movId = Move
     }
 
@@ -106,12 +115,15 @@ enemy {x, y} =
 isEnemy : Thing -> Bool
 isEnemy thing =
     case thing.intId of
-        (Enemy _) -> True
-        _ -> False
+        Enemy _ ->
+            True
+
+        _ ->
+            False
 
 
 zoneEnemy : Pos (Cir a) -> Thing
-zoneEnemy {x, y, radius} =
+zoneEnemy { x, y, radius } =
     { angle = 0
     , x = x
     , y = y
@@ -121,10 +133,11 @@ zoneEnemy {x, y, radius} =
     , color = red
     , alpha = 0.25
     , inpId = Ignore
-    , intId = Zone
-        { pattern = isEnemy
-        , done = False
-        }
+    , intId =
+        Zone
+            { pattern = isEnemy
+            , done = False
+            }
     , movId = Move
     }
 
@@ -144,15 +157,15 @@ die thing =
 isDead : Thing -> Bool
 isDead thing =
     case thing.intId of
-        (Dead _) -> True
-        _ -> False
+        Dead _ ->
+            True
 
-
-
+        _ ->
+            False
 
 
 zoneDead : Pos (Cir a) -> Thing
-zoneDead {x, y, radius} =
+zoneDead { x, y, radius } =
     { angle = 0
     , x = x
     , y = y
@@ -162,16 +175,17 @@ zoneDead {x, y, radius} =
     , color = black
     , alpha = 0.25
     , inpId = Ignore
-    , intId = Zone
-        { pattern = isDead
-        , done = False
-        }
+    , intId =
+        Zone
+            { pattern = isDead
+            , done = False
+            }
     , movId = Move
     }
 
 
 block : Pos a -> Thing
-block {x, y} =
+block { x, y } =
     { angle = 0
     , x = x
     , y = y

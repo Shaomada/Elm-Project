@@ -12,36 +12,33 @@ import Debug
 import GameTypes exposing (..)
 
 
-type alias SignalMap a x y = (a -> x) -> Signal a -> y
+type alias SignalMap a x y =
+    (a -> x) -> Signal a -> y
 
 
-mapOneMore : SignalMap (a, b) x y -> (a -> b -> x) -> Signal a -> Signal b -> y
+mapOneMore : SignalMap ( a, b ) x y -> (a -> b -> x) -> Signal a -> Signal b -> y
 mapOneMore map f sa sb =
-    map (\(a, b) -> f a b) (Signal.map2 (,) sa sb)
+    map (\( a, b ) -> f a b) (Signal.map2 (,) sa sb)
 
 
-map6 : (a -> b -> c -> d -> e -> f -> g) ->
-    Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f ->
-    Signal g
+map6 : (a -> b -> c -> d -> e -> f -> g) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g
 map6 =
     mapOneMore Signal.map5
 
 
-map7 : (a -> b -> c -> d -> e -> f -> g -> h) ->
-    Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f ->
-    Signal g -> Signal h
-map7 = mapOneMore map6
+map7 : (a -> b -> c -> d -> e -> f -> g -> h) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h
+map7 =
+    mapOneMore map6
 
 
-map8 : (a -> b -> c -> d -> e -> f -> g -> h -> i) ->
-    Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f ->
-    Signal g -> Signal h -> Signal i
-map8 = mapOneMore map7
+map8 : (a -> b -> c -> d -> e -> f -> g -> h -> i) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h -> Signal i
+map8 =
+    mapOneMore map7
 
 
 count : Signal a -> Signal Int
 count s =
-  Signal.foldp (\_ n -> n+1) 0 s
+    Signal.foldp (\_ n -> n + 1) 0 s
 
 
 input : Signal Input
@@ -80,9 +77,9 @@ input =
     )
         |> Time.timestamp
         |> Signal.map
-            ( \(t,a) -> (Just t, a) )
+            (\( t, a ) -> ( Just t, a ))
         |> Signal.foldp
-            (\(mt1, a) ( _, mt2, _ ) -> (mt2, mt1, a) )
+            (\( mt1, a ) ( _, mt2, _ ) -> ( mt2, mt1, a ))
             ( Nothing
             , Nothing
             , { x = 0
@@ -95,12 +92,16 @@ input =
               }
             )
         |> Signal.map
-            (\(mt2, mt1, a) ->
-              case mt1 of
-                  Just t1 ->
-                      case mt2 of
-                          Just t2 ->
-                              {a | timePassed = Time.inSeconds <| t1-t2}
-                          _ -> {a | x = 0, y = 0}
-                  _ -> a
+            (\( mt2, mt1, a ) ->
+                case mt1 of
+                    Just t1 ->
+                        case mt2 of
+                            Just t2 ->
+                                { a | timePassed = Time.inSeconds <| t1 - t2 }
+
+                            _ ->
+                                { a | x = 0, y = 0 }
+
+                    _ ->
+                        a
             )

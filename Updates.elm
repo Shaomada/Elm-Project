@@ -33,17 +33,19 @@ loadLevel input model =
     else
         model
 
+
 autoScroll : Input -> Model -> Model
-autoScroll input = scroll
-  { x
-      = (min 0 <| toFloat input.windowWidth / 2 - 100 - input.x)
-      - (min 0 <| toFloat input.windowWidth / 2 - 100 + input.x)
-          |> \ x -> input.timePassed * x
-  , y
-      = (min 0 <| toFloat input.windowHeight / 2 - 100 - input.y)
-      - (min 0 <| toFloat input.windowHeight / 2 - 100 + input.y)
-          |> \ y -> input.timePassed * y
-  }
+autoScroll input =
+    scroll
+        { x =
+            (min 0 <| toFloat input.windowWidth / 2 - 100 - input.x)
+                - (min 0 <| toFloat input.windowWidth / 2 - 100 + input.x)
+                |> \x -> input.timePassed * x
+        , y =
+            (min 0 <| toFloat input.windowHeight / 2 - 100 - input.y)
+                - (min 0 <| toFloat input.windowHeight / 2 - 100 + input.y)
+                |> \y -> input.timePassed * y
+        }
 
 
 manualScroll : Input -> Model -> Model
@@ -52,9 +54,9 @@ manualScroll input model =
         isDown ' ' input
     then
         scroll
-            ( searchActive input model.things
-                |> Maybe.map (\ {x, y} -> {x = -x, y = -y} )
-                |> Maybe.withDefault {x = 0, y = 0}
+            (searchActive input model.things
+                |> Maybe.map (\{ x, y } -> { x = -x, y = -y })
+                |> Maybe.withDefault { x = 0, y = 0 }
             )
             model
     else
@@ -63,37 +65,46 @@ manualScroll input model =
 
 searchActive input list =
     case list of
-        (thing :: things) ->
+        thing :: things ->
             case thing.inpId of
-                (FollowMouse c) ->
+                FollowMouse c ->
                     if
                         isDown c input
                     then
                         Just thing
                     else
                         searchActive input things
-                _ -> searchActive input things
-        [] -> Nothing
+
+                _ ->
+                    searchActive input things
+
+        [] ->
+            Nothing
 
 
 scroll : Pos a -> Model -> Model
-scroll {x, y} model =
+scroll { x, y } model =
     { model
-        | things = List.map
-            (\thing ->
-                { thing
-                    | x = thing.x + x
-                    , y = thing.y + y
-                    , movId = case thing.movId of
-                        Move -> Move
-                        MoveTowards pos -> MoveTowards
-                            { pos
-                                | x = pos.x + x
-                                , y = pos.y + y
-                            }
-                }
-            )
-            model.things
+        | things =
+            List.map
+                (\thing ->
+                    { thing
+                        | x = thing.x + x
+                        , y = thing.y + y
+                        , movId =
+                            case thing.movId of
+                                Move ->
+                                    Move
+
+                                MoveTowards pos ->
+                                    MoveTowards
+                                        { pos
+                                            | x = pos.x + x
+                                            , y = pos.y + y
+                                        }
+                    }
+                )
+                model.things
     }
 
 
@@ -134,16 +145,24 @@ won model =
 unDone : Thing -> Bool
 unDone thing =
     case thing.intId of
-        (Zone x) -> not x.done
-        _ -> False
+        Zone x ->
+            not x.done
+
+        _ ->
+            False
 
 
 tick : Thing -> Thing
 tick thing =
     case thing.intId of
-        (Enemy _) -> {thing | intId = Enemy {distance = Nothing} }
-        (Zone x) -> {thing | intId = Zone {x | done = False} }
-        _ -> thing
+        Enemy _ ->
+            { thing | intId = Enemy { distance = Nothing } }
+
+        Zone x ->
+            { thing | intId = Zone { x | done = False } }
+
+        _ ->
+            thing
 
 
 isDown : Char -> Key a -> Bool
@@ -227,79 +246,86 @@ type alias F =
 interact : F
 interact that this =
     case this.intId of
-        (Enemy dataThis) ->
+        Enemy dataThis ->
             case that.intId of
-                (Player _) ->
+                Player _ ->
                     if
                         dataThis.distance
                             |> Maybe.map (\d -> d > distance that this)
                             |> Maybe.withDefault True
                     then
                         { this
-                            | movId = MoveTowards
-                                { x = that.x
-                                , y = that.y
-                                }
-                            , intId = Enemy
-                                { distance = Just <| distance that this
-                                }
+                            | movId =
+                                MoveTowards
+                                    { x = that.x
+                                    , y = that.y
+                                    }
+                            , intId =
+                                Enemy
+                                    { distance = Just <| distance that this
+                                    }
                         }
                     else
                         this
-                    
 
-                (Bouncy _) ->
-                    onTouch moveOutOff that this
-                
-                (Block _) ->
+                Bouncy _ ->
                     onTouch moveOutOff that this
 
-                (Enemy _) ->
+                Block _ ->
                     onTouch moveOutOff that this
 
-                _ -> this
-        (Player _) ->
+                Enemy _ ->
+                    onTouch moveOutOff that this
+
+                _ ->
+                    this
+
+        Player _ ->
             case that.intId of
-                (Player _) ->
+                Player _ ->
                     onTouch moveOutOff that this
 
-                (Bouncy _) ->
-                    onTouch moveOutOff that this
-                
-                (Block _) ->
+                Bouncy _ ->
                     onTouch moveOutOff that this
 
-                (Enemy _) ->
+                Block _ ->
+                    onTouch moveOutOff that this
+
+                Enemy _ ->
                     onTouch dieFrom that this
-                
-                _ -> this
 
-        (Bouncy _) ->
+                _ ->
+                    this
+
+        Bouncy _ ->
             case that.intId of
-                (Player _) ->
+                Player _ ->
                     onTouch (combine moveOutOff getPushedBy) that this
 
-                (Bouncy _) ->
-                    onTouch moveOutOff that this
-                
-                (Block _) ->
+                Bouncy _ ->
                     onTouch moveOutOff that this
 
-                (Enemy _) ->
+                Block _ ->
+                    onTouch moveOutOff that this
+
+                Enemy _ ->
                     this
-                
-                _ -> this
 
-        (Zone x) ->
+                _ ->
+                    this
+
+        Zone x ->
             onWithin (checkPattern x) that this
-        _ -> this
+
+        _ ->
+            this
 
 
 checkPattern x that this =
     if
         x.pattern that
     then
-        { this | intId = Zone {x | done = True } }
+        { this | intId = Zone { x | done = True } }
     else
         this
 
