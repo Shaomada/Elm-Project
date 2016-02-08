@@ -23,6 +23,10 @@ update input model =
 loadLevel : Input -> Model -> Model
 loadLevel input model =
     if
+        isDown 'R' input
+    then
+        Levels.level model.level
+    else if
         isDown 'N' input && model.won
     then
         Levels.level <| model.level + 1
