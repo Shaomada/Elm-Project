@@ -8216,7 +8216,7 @@ Elm.Levels.make = function (_elm) {
                             ,_0: _U.list([A2($Things.player,_U.chr("1"),{x: -200,y: 0})
                                          ,$Things.enemy({x: 0,y: 0})
                                          ,$Things.zonePlayer({x: 200,y: 0,radius: 35})])
-                            ,_1: _U.list(["You can reset a Level at anytime by pressing \'R\'"])}
+                            ,_1: _U.list(["You can reset a Level at any time by pressing \'R\'"])}
                            ,{ctor: "_Tuple2"
                             ,_0: _U.list([A2($Things.player,_U.chr("1"),{x: 0,y: 0})
                                          ,$Things.enemy({x: -200,y: 0})
@@ -8270,7 +8270,7 @@ Elm.Levels.make = function (_elm) {
    var levels = $Array.fromList(A2($List.indexedMap,createLevel,levelData));
    var level = function (i) {
       return A2($Maybe.withDefault,
-      A2(createLevel,i,{ctor: "_Tuple2",_0: _U.list([]),_1: _U.list(["Index out of range, loading empty Level"])}),
+      A2(createLevel,i,{ctor: "_Tuple2",_0: _U.list([$Things.zoneDead({x: 0,y: 0,radius: 0})]),_1: _U.list(["Index out of range, loading unsolveable Level"])}),
       A2($Array.get,i,levels));
    };
    var initial = level(0);
