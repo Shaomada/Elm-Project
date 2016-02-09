@@ -48,7 +48,7 @@ levelData =
     [ ( [ Things.player '1' { x = -200, y = 100 }
         , Things.zonePlayer { x = 200, y = 100, radius = 50 }
         ]
-      , [ "Hold down '1' while selecting a trget,"
+      , [ "Hold down '1' while selecting a target,"
         , "then hold down the left Mouse Button to move."
         , "Try to get into the blue Zone."
         ]
