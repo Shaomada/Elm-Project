@@ -1,63 +1,61 @@
-module Levels (..) where
+module Levels exposing (..)
+
+import Model exposing (..)
+import Thing exposing (..)
+import Things
 
 import Array
 import Maybe
-import GameTypes
-import Things
 
-
-initial : GameTypes.Model
-initial =
+init : Model
+init =
     level 0
 
-
-level : Int -> GameTypes.Model
+level : Int -> Model
 level i =
     Array.get i levels
-        |> Maybe.withDefault
-            (createLevel
-                i
-                ( [ Things.zoneDead { x = 0, y = 0, radius = 0 }
-                  ]
-                , [ "Index out of range, loading unsolveable Level"
-                  ]
-                )
+    |> Maybe.withDefault
+        (   createLevel
+            i
+            (   [ Things.zoneDead { x = 0, y = 0, radius = 0 } ]
+            ,   [ "Index out of range, loading unsolveable Level"]
             )
+        )
 
-
-levels : Array.Array GameTypes.Model
+levels : Array.Array Model
 levels =
     levelData
         |> List.indexedMap createLevel
         |> Array.fromList
 
-
-createLevel : Int -> ( List GameTypes.Thing, List String ) -> GameTypes.Model
-createLevel i ( things, messages ) =
-    { things = things
-    , windowWidth = 0
-    , windowHeight = 0
-    , won = False
-    , level = i
-    , messages = messages
+createLevel : Int -> ( List Thing, List String ) -> Model
+createLevel i ( things, text ) =
+    {   things = things
+    ,   position = { x = 0, y = 0 }
+    ,   size = { width = 1200, height = 800 }
+    ,   viewPosition = { x = 0, y = 0 }
+    ,   state = Running
+    ,   level = i
+    ,   text = text
     }
 
-
-levelData : List ( List GameTypes.Thing, List String )
+levelData : List ( List Thing, List String )
 levelData =
     [ ( [ Things.player '1' { x = -200, y = 100 }
         , Things.zonePlayer { x = 200, y = 100, radius = 50 }
         ]
-      , [ "Hold down '1' while selecting a target,"
-        , "then hold down the left Mouse Button to move."
-        , "Try to get into the blue Zone."
+      , [ "Try to get into the blue Zone. While you hold down"
+        , "the Key '1', your Circle labeled with the same key"
+        , "will select the mouse position as it's target"
         ]
       )
     , ( [ Things.player '1' { x = -200, y = 0 }
         , Things.enemy { x = 0, y = 0 }
         , Things.zonePlayer { x = 200, y = 0, radius = 35 }
         ]
-      , [ "You can reset a Level at any time by pressing 'R'" ]
+      , [ "You can reset a Level at any time by pressing 'R'."
+        , "Also, you can toggle Pause on and off pressing Space."
+        , "During Pause, you can still select targets"]
       )
     , ( [ Things.player '1' { x = -200, y = 50 }
         , Things.bouncy { x = 200, y = 50 }
