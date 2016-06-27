@@ -1,18 +1,19 @@
 module LevelData exposing (..)
 
 import Thing
-
 import Array
 import Maybe
 
-invalidLevel : ( List Thing.Model , List String )
+
+invalidLevel : ( List Thing.Model, List String )
 invalidLevel =
-    (   [ Thing.zoneDead 0 { x = 0, y = 0 }
-        ]
-    ,   [ "Tried to load a Level out of Bounds."
-        , "That is a bug."
-        ]
+    ( [ Thing.zoneDead 0 { x = 0, y = 0 }
+      ]
+    , [ "Tried to load a Level out of Bounds."
+      , "That is a bug."
+      ]
     )
+
 
 levelData : Array.Array ( List Thing.Model, List String )
 levelData =
@@ -30,7 +31,8 @@ levelData =
         ]
       , [ "You can reset a Level at any time by pressing 'R'."
         , "Also, you can toggle Pause on and off pressing Space."
-        , "During Pause, you can still select targets"]
+        , "During Pause, you can still select targets"
+        ]
       )
     , ( [ Thing.player '1' { x = -200, y = 50 }
         , Thing.bouncy { x = 200, y = 50 }
@@ -104,4 +106,4 @@ levelData =
         ]
       )
     ]
-    |> Array.fromList
+        |> Array.fromList

@@ -7,6 +7,7 @@ import Html.App
 import Element
 
 
+main : Program Never
 main =
     Html.App.program
         { init = init ! []
@@ -46,21 +47,24 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         -- Output Msg's
+        GameMsg (Game.ResetViewPosition) ->
+            update (DisplayMsg <| Display.ResetViewPosition { x = 0, y = 0 }) model
+
         DisplayMsg (Display.MouseMoved pos) ->
             update (GameMsg <| Game.MouseMoved pos) model
-        GameMsg Game.ResetViewPosition ->
-            update (DisplayMsg <| Display.ResetViewPosition { x = 0, y = 0 }) model
 
         -- Input Msg's
         DisplayMsg msg' ->
             let
-                ( display, cmd ) = Display.update msg' model.display
+                ( display, cmd ) =
+                    Display.update msg' model.display
             in
                 ( { model | display = display }, Cmd.map DisplayMsg cmd )
 
         GameMsg msg' ->
             let
-                ( game, cmd ) = Game.update msg' model.game
+                ( game, cmd ) =
+                    Game.update msg' model.game
             in
                 ( { model | game = game }, Cmd.map GameMsg cmd )
 
