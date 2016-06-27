@@ -43,7 +43,7 @@ type Msg
 
 toCmd : Msg -> Cmd Msg
 toCmd msg =
-    Random.generate identity (Random.map (\_ -> msg) Random.bool)
+    Random.generate (\_ -> msg) Random.bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
