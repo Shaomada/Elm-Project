@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Display
 import Game
+import Shared
 import Html
 import Html.App
 import Element
@@ -45,28 +46,32 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        -- Output Msg's
-        GameMsg (Game.ResetViewPosition) ->
-            update (DisplayMsg <| Display.ResetViewPosition { x = 0, y = 0 }) model
+    let
+        ( model', msg' ) =
+            case msg of
+                DisplayMsg displayMsg ->
+                    let
+                        ( display', x ) =
+                            Display.update displayMsg model.display
+                    in
+                        ( { model | display = display' }, x )
 
-        DisplayMsg (Display.MouseMoved pos) ->
-            update (GameMsg <| Game.MouseMoved pos) model
+                GameMsg gameMsg ->
+                    let
+                        ( game', x ) =
+                            Game.update gameMsg model.game
+                    in
+                        ( { model | game = game' }, x )
+    in
+        case msg' of
+            Shared.EndUpdate ->
+                model' ! []
 
-        -- Input Msg's
-        DisplayMsg msg' ->
-            let
-                ( display, cmd ) =
-                    Display.update msg' model.display
-            in
-                ( { model | display = display }, Cmd.map DisplayMsg cmd )
+            Shared.MouseMoved pos ->
+                update (GameMsg <| Game.MouseMoved pos) model'
 
-        GameMsg msg' ->
-            let
-                ( game, cmd ) =
-                    Game.update msg' model.game
-            in
-                ( { model | game = game }, Cmd.map GameMsg cmd )
+            Shared.ResetViewPosition pos ->
+                update (DisplayMsg <| Display.ResetViewPosition pos) model'
 
 
 

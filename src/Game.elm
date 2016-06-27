@@ -1,5 +1,6 @@
 module Game exposing (..)
 
+import Shared exposing (only, andThen)
 import Thing
 import LevelData
 import Array
@@ -10,7 +11,6 @@ import Char
 import Collage
 import Text
 import Color
-import Random
 
 
 -- MODEL
@@ -62,24 +62,11 @@ type Msg
     | KeyUp Char
     | MouseMoved { x : Float, y : Float }
     | TimeDiff Float
-    | ResetViewPosition
 
 
-
--- OUTPUT
-
-
-toCmd : Msg -> Cmd Msg
-toCmd msg =
-    Random.generate (\_ -> msg) Random.bool
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Shared.Msg )
 update msg model =
     case ( msg, model.state ) of
-        ( ResetViewPosition, _ ) ->
-            model ! []
-
         ( Interactions, Running ) ->
             let
                 ( things, won ) =
@@ -90,87 +77,88 @@ update msg model =
                         x :: xs ->
                             recurse [] x xs
             in
-                { model
-                    | things = things
-                    , state =
-                        if won then
-                            Won
-                        else
-                            Running
-                }
-                    ! []
+                only
+                    { model
+                        | things = things
+                        , state =
+                            if won then
+                                Won
+                            else
+                                Running
+                    }
 
         ( Interactions, _ ) ->
-            model ! []
+            only model
 
         ( LoadLevel id, _ ) ->
-            (level id) ! [ toCmd ResetViewPosition ]
+            andThen (level id)
+                <| Shared.ResetViewPosition { x = 0, y = 0 }
 
         ( KeyDown c, Won ) ->
             case c of
                 'N' ->
-                    model ! [ toCmd <| LoadLevel <| model.level + 1 ]
+                    update (LoadLevel <| model.level + 1) model
 
                 'R' ->
-                    model ! [ toCmd <| LoadLevel model.level ]
+                    update (LoadLevel model.level) model
 
                 _ ->
-                    model ! []
+                    only model
 
         ( KeyDown c, Running ) ->
             case c of
                 'R' ->
-                    model ! [ toCmd <| LoadLevel model.level ]
+                    update (LoadLevel model.level) model
 
                 ' ' ->
-                    { model | state = Paused } ! []
+                    only { model | state = Paused }
 
                 _ ->
-                    { model
-                        | things = List.map (Thing.update <| Thing.KeyDown c) model.things
-                    }
-                        ! []
+                    only
+                        { model
+                            | things = List.map (Thing.update <| Thing.KeyDown c) model.things
+                        }
 
         ( KeyDown c, Paused ) ->
             case c of
                 'R' ->
-                    model ! [ toCmd <| LoadLevel model.level ]
+                    update (LoadLevel model.level) model
 
                 ' ' ->
-                    { model | state = Running } ! []
+                    only { model | state = Running }
 
                 _ ->
-                    { model
-                        | things = List.map (Thing.update <| Thing.KeyDown c) model.things
-                    }
-                        ! []
+                    only
+                        { model
+                            | things = List.map (Thing.update <| Thing.KeyDown c) model.things
+                        }
 
         ( KeyUp c, Won ) ->
-            model ! []
+            only model
 
         ( KeyUp c, _ ) ->
-            { model
-                | things = List.map (Thing.update <| Thing.KeyUp c) model.things
-            }
-                ! []
+            only
+                { model
+                    | things = List.map (Thing.update <| Thing.KeyUp c) model.things
+                }
 
         ( MouseMoved pos, Won ) ->
-            model ! []
+            only model
 
         ( MouseMoved pos, _ ) ->
-            { model
-                | things = List.map (Thing.update <| Thing.MouseMoved pos) model.things
-            }
-                ! []
+            only
+                { model
+                    | things = List.map (Thing.update <| Thing.MouseMoved pos) model.things
+                }
 
         ( TimeDiff t, Running ) ->
-            { model
-                | things = List.map (Thing.update <| Thing.TimeDiff t) model.things
-            }
-                ! [ toCmd Interactions ]
+            update Interactions
+                { model
+                    | things = List.map (Thing.update <| Thing.TimeDiff t) model.things
+                }
 
         ( TimeDiff t, _ ) ->
-            model ! []
+            only model
 
 
 recurse : List Thing.Model -> Thing.Model -> List Thing.Model -> ( List Thing.Model, Bool )

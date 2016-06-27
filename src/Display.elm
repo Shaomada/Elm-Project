@@ -8,6 +8,7 @@ import List
 import Collage
 import Element
 import Random
+import Shared exposing (only, andThen)
 
 
 type alias Model =
@@ -34,53 +35,30 @@ type Msg
     | RawMouseMoved { x : Int, y : Int }
     | TimePassed Float
     | ResetViewPosition { x : Float, y : Float }
-    | MouseMoved { x : Float, y : Float }
 
 
-
--- output
-
-
-toCmd : Msg -> Cmd Msg
-toCmd msg =
-    Random.generate (\_ -> msg) Random.bool
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Shared.Msg )
 update msg display =
     let
         display' =
             update' msg display
     in
-        case msg of
-            MouseMoved _ ->
-                display ! []
+        let
+            display' =
+                update' msg display
 
-            WindowResize _ ->
-                update' msg display ! []
-
-            _ ->
-                let
-                    display' =
-                        update' msg display
-
-                    cmdMsg =
-                        [ toCmd
-                            <| MouseMoved
-                                { x = display'.mousePosition.x + display'.viewPosition.x
-                                , y = display'.mousePosition.y + display'.viewPosition.y
-                                }
-                        ]
-                in
-                    display' ! cmdMsg
+            sharedMsg =
+                Shared.MouseMoved
+                    { x = display'.mousePosition.x + display'.viewPosition.x
+                    , y = display'.mousePosition.y + display'.viewPosition.y
+                    }
+        in
+            display' `andThen` sharedMsg
 
 
 update' : Msg -> Model -> Model
 update' msg display =
     case msg of
-        MouseMoved _ ->
-            display
-
         WindowResize size ->
             { display | size = size }
 
