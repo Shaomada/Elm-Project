@@ -11,18 +11,6 @@ import Collage
 -- MODEL
 
 
-type Id
-    = Player { handle : Char, handleDown : Bool }
-    | Enemy { distance : Maybe Float }
-    | Bouncy {}
-    | Block {}
-    | Dead {}
-    | Zone
-        { pattern : Thing -> Bool
-        , done : Bool
-        }
-
-
 type alias Model =
     { id : Id
     , x : Float
@@ -35,107 +23,40 @@ type alias Model =
     }
 
 
-type alias Thing =
-    Model
+type Id
+    = Player { handle : Char, handleDown : Bool }
+    | Enemy { distance : Maybe Float }
+    | Bouncy {}
+    | Block {}
+    | Zone
+        { pattern : Pattern
+        , done : Bool
+        }
+    | Dead {}
 
 
-model : Id -> { a | radius : Float, speed : Float, color : Color.Color, alpha : Float } -> { b | x : Float, y : Float } -> Thing
-model id { radius, speed, color, alpha } { x, y } =
-    { id = id
-    , x = x
-    , y = y
-    , target = Nothing
-    , radius = radius
-    , speed = speed
-    , color = color
-    , alpha = alpha
+die : Model -> Model
+die thing =
+    { thing
+        | id = Dead {}
+        , color = Color.yellow
+        , speed = 0
+        , alpha = 0.4
     }
 
 
-player : Char -> { a | x : Float, y : Float } -> Thing
-player c =
-    model (Player { handle = c, handleDown = False })
-        { radius = 30
-        , speed = 70
-        , color = Color.blue
-        , alpha = 0.9
-        }
+type alias Pattern =
+    Model -> Bool
 
 
-enemy : { a | x : Float, y : Float } -> Thing
-enemy =
-    model (Enemy { distance = Nothing })
-        { radius = 50
-        , speed = 45
-        , color = Color.red
-        , alpha = 0.8
-        }
+impossible : Pattern
+impossible thing =
+    False
 
 
-bouncy : { a | x : Float, y : Float } -> Thing
-bouncy =
-    model (Bouncy {})
-        { radius = 20
-        , speed = 60
-        , color = Color.green
-        , alpha = 0.9
-        }
-
-
-block : { a | x : Float, y : Float } -> Thing
-block =
-    model (Block {})
-        { radius = 20
-        , speed = 60
-        , color = Color.black
-        , alpha = 0.9
-        }
-
-
-dead : Thing -> Thing
-dead thing =
-    model (Dead {})
-        { thing
-            | color = Color.yellow
-            , speed = 0
-            , alpha = 0.4
-        }
-        thing
-
-
-zone : Thing -> Float -> { a | x : Float, y : Float } -> Thing
-zone thing radius =
-    model (Zone { pattern = equalId thing, done = False })
-        { radius = radius
-        , speed = 0
-        , color = thing.color
-        , alpha = 0.25
-        }
-
-
-pos =
-    { x = 0, y = 0 }
-
-
-zonePlayer =
-    zone <| player '\n' pos
-
-
-zoneEnemy =
-    zone <| enemy pos
-
-
-zoneBouncy =
-    zone <| bouncy pos
-
-
-zoneDead =
-    zone <| dead <| block pos
-
-
-equalId : Thing -> Thing -> Bool
-equalId a b =
-    case ( a.id, b.id ) of
+compareTypeTo : Model -> Pattern
+compareTypeTo example thing =
+    case ( example.id, thing.id ) of
         ( Player _, Player _ ) ->
             True
 
@@ -143,9 +64,6 @@ equalId a b =
             True
 
         ( Bouncy _, Bouncy _ ) ->
-            True
-
-        ( Block _, Block _ ) ->
             True
 
         ( Dead _, Dead _ ) ->
@@ -169,7 +87,7 @@ type Msg
     | TimeDiff Float
 
 
-update : Msg -> Thing -> Thing
+update : Msg -> Model -> Model
 update msg thing =
     case ( msg, thing.id ) of
         ( KeyDown char, Player { handle, handleDown } ) ->
@@ -205,7 +123,7 @@ update msg thing =
             thing
 
 
-reset : Thing -> Thing
+reset : Model -> Model
 reset thing =
     case thing.id of
         Enemy _ ->
@@ -218,7 +136,7 @@ reset thing =
             thing
 
 
-moveFor : Float -> Thing -> Thing
+moveFor : Float -> Model -> Model
 moveFor time thing =
     case thing.target of
         Nothing ->
@@ -279,7 +197,7 @@ interact that this =
 
         ( Player _, Enemy _ ) ->
             if touching that this then
-                dead this
+                die this
             else
                 this
 
@@ -303,7 +221,7 @@ interact that this =
 -- VIEW
 
 
-view : Int -> Thing -> Collage.Form
+view : Int -> Model -> Collage.Form
 view layer =
     case layer of
         0 ->
@@ -322,7 +240,7 @@ view layer =
             \_ -> Collage.group []
 
 
-viewBoundry : Thing -> Collage.Form
+viewBoundry : Model -> Collage.Form
 viewBoundry thing =
     case thing.id of
         Zone { done } ->
@@ -342,7 +260,7 @@ viewBoundry thing =
                 |> Collage.move ( thing.x, thing.y )
 
 
-viewBody : Thing -> Collage.Form
+viewBody : Model -> Collage.Form
 viewBody thing =
     Collage.circle thing.radius
         |> Collage.filled thing.color
@@ -350,7 +268,7 @@ viewBody thing =
         |> Collage.move ( thing.x, thing.y )
 
 
-viewPath : Thing -> Collage.Form
+viewPath : Model -> Collage.Form
 viewPath thing =
     thing.target
         |> Maybe.map
@@ -361,7 +279,7 @@ viewPath thing =
         |> Maybe.withDefault (Collage.group [])
 
 
-viewId : Thing -> Collage.Form
+viewId : Model -> Collage.Form
 viewId thing =
     case thing.id of
         Player { handle, handleDown } ->

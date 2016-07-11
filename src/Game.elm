@@ -1,5 +1,7 @@
 module Game exposing (..)
 
+import GameModel exposing (..)
+import Level
 import Shared exposing (only, andThen)
 import Thing
 import LevelData
@@ -11,45 +13,6 @@ import Char
 import Collage
 import Text
 import Color
-
-
--- MODEL
-
-
-type alias Model =
-    { things : List Thing.Model
-    , state : GameState
-    , level : Int
-    , text : List String
-    }
-
-
-type GameState
-    = Won
-    | Running
-    | Paused
-
-
-init : Model
-init =
-    level 0
-
-
-level : Int -> Model
-level i =
-    Array.get i LevelData.levelData
-        |> Maybe.withDefault LevelData.invalidLevel
-        |> createLevel i
-
-
-createLevel : Int -> ( List Thing.Model, List String ) -> Model
-createLevel i ( things, text ) =
-    { things = things
-    , state = Paused
-    , level = i
-    , text = text
-    }
-
 
 
 -- UPDATE
@@ -91,7 +54,7 @@ update msg model =
             only model
 
         ( LoadLevel id, _ ) ->
-            andThen (level id)
+            andThen (Level.level id)
                 <| Shared.ResetViewPosition { x = 0, y = 0 }
 
         ( KeyDown c, Won ) ->

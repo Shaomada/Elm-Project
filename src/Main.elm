@@ -2,6 +2,8 @@ module Main exposing (..)
 
 import Display
 import Game
+import GameModel
+import Level
 import Shared
 import Html
 import Html.App
@@ -24,14 +26,14 @@ main =
 
 type alias Model =
     { display : Display.Model
-    , game : Game.Model
+    , game : GameModel.Model
     }
 
 
 init : Model
 init =
     { display = Display.init
-    , game = Game.init
+    , game = Level.level 0
     }
 
 
