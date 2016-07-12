@@ -18,3 +18,16 @@ type GameState
     = Won
     | Running
     | Paused
+
+
+
+-- initial GameModel for Editor
+
+
+init : Model
+init =
+    { things = []
+    , state = Running
+    , level = -2
+    , text = []
+    }
