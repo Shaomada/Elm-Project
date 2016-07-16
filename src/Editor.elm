@@ -252,11 +252,22 @@ subscriptions model =
 
 -- VIEW
 
+viewFocused : Model -> List Collage.Form
+viewFocused model =
+    case model.state of
+      FocusedThing i ->
+          model.level.things
+          |>    List.indexedMap (\j t -> if i==j then [Thing.viewBoundry t] else [])
+          |>    List.concat
+      _ -> []
 
 view : Model -> ( List Collage.Form, List Collage.Form )
 view model =
-    ( List.append (List.map Thing.viewBody model.level.things)
-        (showSubwindow model)
+    ( List.concat
+      [ List.map Thing.viewBody model.level.things
+      , viewFocused model
+      , showSubwindow model
+      ]
     , []
     )
 
