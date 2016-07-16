@@ -84,7 +84,7 @@ currButtons model =
 midOfButton : Model -> Int -> ( Float, Float )
 midOfButton model i =
     ( model.subwindowPosition.x + buttonWidth / 2
-    , model.subwindowPosition.y + buttonHeight / 2 + buttonHeight * toFloat i
+    , model.subwindowPosition.y - buttonHeight / 2 - buttonHeight * toFloat i
     )
 
 
@@ -112,7 +112,7 @@ showSubwindow model =
             model.subwindowPosition.x + buttonWidth / 2
 
         y =
-            model.subwindowPosition.y + (toFloat length) * buttonHeight / 2 + heightHead / 2
+            model.subwindowPosition.y - (toFloat length) * buttonHeight / 2 + heightHead / 2
     in
         buttons
             |> List.indexedMap (showButton model)
@@ -137,17 +137,20 @@ buttonClick model =
             model.mousePosition.x - model.subwindowPosition.x
 
         y =
-            model.mousePosition.y - model.subwindowPosition.y
+            model.subwindowPosition.y - model.mousePosition.y
 
         i =
             floor <| y / buttonHeight
     in
-        if y >= 0 && y < buttonHeight * toFloat length + heightHead && x >= 0 && x < buttonWidth then
-            buttons
-                |> List.drop i
-                |> List.head
-                |> Maybe.map (\button -> Just <| button.onClick model)
-                |> Maybe.withDefault (Just { model | state = DraggingSubwindow })
+        if y >= 0 - buttonHeight * heightHead && y < buttonHeight * toFloat length && x >= 0 && x < buttonWidth then
+            if y < 0 then
+                Just { model | state = DraggingSubwindow }
+            else
+                buttons
+                    |> List.drop i
+                    |> List.head
+                    |> Maybe.map (\button -> Just <| button.onClick model)
+                    |> Maybe.withDefault Nothing
         else
             Nothing
 
