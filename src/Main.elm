@@ -91,7 +91,7 @@ update msg model =
             Shared.MouseMoved pos ->
                 case model.state of
                     Playing ->
-                        update (GameMsg <| Game.MouseMoved pos) model'
+                        update (GameMsg <| Game.MouseMoved { x = pos.x, y = pos.y }) model'
 
                     Editing ->
                         update (EditorMsg <| Editor.MouseMoved pos) model'

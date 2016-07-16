@@ -51,6 +51,8 @@ update msg display =
                 Shared.MouseMoved
                     { x = display'.mousePosition.x + display'.viewPosition.x
                     , y = display'.mousePosition.y + display'.viewPosition.y
+                    , xRaw = display'.mousePosition.x
+                    , yRaw = display'.mousePosition.y
                     }
         in
             display' `andThen` sharedMsg

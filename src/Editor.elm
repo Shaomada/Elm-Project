@@ -15,7 +15,7 @@ import Color
 
 type alias Model =
     { level : LevelSyntax.Model
-    , mousePosition : { x : Float, y : Float }
+    , mousePosition : { x : Float, y : Float, xRaw : Float, yRaw: Float }
     , subwindowPosition : { x : Float, y : Float }
     , state : State
     }
@@ -33,8 +33,8 @@ type State
 init : Model
 init =
     { level = LevelSyntax.text "press n at any time to return to the Editor" <| LevelSyntax.empty
-    , mousePosition = { x = 0, y = 0 }
-    , subwindowPosition = { x = 0, y = 0 }
+    , mousePosition = { x = 0, y = 0, xRaw = 0, yRaw = 0 }
+    , subwindowPosition = { x = 200, y = 200 }
     , state = NoOp
     }
 
@@ -262,10 +262,10 @@ buttonClick model =
             List.length buttons
 
         x =
-            model.mousePosition.x - model.subwindowPosition.x
+            model.mousePosition.xRaw - model.subwindowPosition.x
 
         y =
-            model.subwindowPosition.y - model.mousePosition.y
+            model.subwindowPosition.y - model.mousePosition.yRaw
 
         i =
             floor <| y / buttonHeight
@@ -290,7 +290,7 @@ buttonClick model =
 type Msg
     = MouseDown
     | MouseUp
-    | MouseMoved { x : Float, y : Float }
+    | MouseMoved { x : Float, y : Float, xRaw : Float, yRaw : Float }
 
 
 update : Msg -> Model -> ( Model, Shared.Msg )
@@ -330,11 +330,11 @@ update msg ({ level } as model) =
                                     model.state
                     }
 
-                MouseMoved { x, y } ->
+                MouseMoved { x, y, xRaw, yRaw } ->
                     case model.state of
                         DraggingThing i ->
                             { model
-                                | mousePosition = { x = x, y = y }
+                                | mousePosition = { x = x, y = y, xRaw = xRaw, yRaw = yRaw }
                                 , level =
                                     { level
                                         | things =
@@ -354,15 +354,15 @@ update msg ({ level } as model) =
 
                         DraggingSubwindow ->
                             { model
-                                | mousePosition = { x = x, y = y }
+                                | mousePosition = { x = x, y = y, xRaw = xRaw, yRaw = yRaw }
                                 , subwindowPosition =
-                                    { x = model.subwindowPosition.x + x - model.mousePosition.x
-                                    , y = model.subwindowPosition.y + y - model.mousePosition.y
+                                    { x = model.subwindowPosition.x + xRaw - model.mousePosition.xRaw
+                                    , y = model.subwindowPosition.y + yRaw - model.mousePosition.yRaw
                                     }
                             }
 
                         _ ->
-                            { model | mousePosition = { x = x, y = y } }
+                            { model | mousePosition = { x = x, y = y, xRaw = xRaw, yRaw = yRaw } }
     in
         ( model'
         , if model'.state == Launch then
@@ -413,9 +413,8 @@ view model =
     ( List.concat
         [ List.map Thing.viewBody model.level.things
         , viewFocused model
-        , showSubwindow model
         ]
-    , []
+    , showSubwindow model
     )
 
 
