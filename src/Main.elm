@@ -4,6 +4,7 @@ import Display
 import Game
 import GameModel
 import Editor
+import Menue
 import Level
 import LevelData
 import Shared
@@ -29,12 +30,14 @@ main =
 type State
     = Playing
     | Editing
+    | InMenue
 
 
 type alias Model =
     { display : Display.Model
     , game : GameModel.Model
     , editor : Editor.Model
+    , menue : Menue.Model
     , state : State
     }
 
@@ -44,7 +47,8 @@ init =
     { display = Display.init
     , game = Level.level 0
     , editor = Editor.init
-    , state = Editing
+    , menue = Menue.init
+    , state = InMenue
     }
 
 
@@ -56,6 +60,7 @@ type Msg
     = DisplayMsg Display.Msg
     | GameMsg Game.Msg
     | EditorMsg Editor.Msg
+    | MenueMsg Menue.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -83,6 +88,12 @@ update msg model =
                             Editor.update editorMsg model.editor
                     in
                         ( { model | editor = editor' }, x )
+                MenueMsg menueMsg ->
+                    let
+                        ( menue', x ) =
+                            Menue.update menueMsg model.menue
+                    in
+                        ( { model | menue = menue' }, x )
     in
         case msg' of
             Shared.EndUpdate ->
@@ -96,6 +107,8 @@ update msg model =
                     Editing ->
                         update (EditorMsg <| Editor.MouseMoved pos) model'
 
+                    _ -> model ! []
+
             Shared.ResetViewPosition pos ->
                 update (DisplayMsg <| Display.ResetViewPosition pos) model'
 
@@ -106,8 +119,10 @@ update msg model =
                 { model | state = Editing } ! []
 
             Shared.Play ->
-                update (DisplayMsg <| Display.ResetViewPosition { x = 0, y = 0 })
-                    { model | game = Level.level 0, state = Playing }
+                { model | state = Playing } ! []
+
+            Shared.Menue ->
+                init ! []
 
 
 
@@ -123,6 +138,9 @@ subscriptions model =
 
         Editing ->
             Sub.map EditorMsg <| Editor.subscriptions model.editor
+
+        InMenue ->
+            Sub.map MenueMsg <| Menue.subscriptions model.menue
     ]
         |> Sub.batch
 
@@ -139,6 +157,9 @@ view model =
 
         Editing ->
             Editor.view model.editor
+
+        InMenue ->
+            Menue.view model.menue
     )
         |> Display.view model.display
         |> Element.toHtml

@@ -21,7 +21,7 @@ type alias Model =
 init : Model
 init =
     { size = { width = 1200, height = 800 }
-    , mousePosition = { x = 600, y = 400 }
+    , mousePosition = { x = 0, y = 0 }
     , viewPosition = { x = 0, y = 0 }
     }
 

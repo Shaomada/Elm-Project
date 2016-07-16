@@ -8,6 +8,7 @@ type Msg
     | Launch
     | OpenEditor
     | Play
+    | Menue
 
 
 andThen : a -> Msg -> ( a, Msg )

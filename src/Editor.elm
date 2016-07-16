@@ -27,14 +27,14 @@ type State
     | DraggingThing Int
     | FocusedThing Int
     | Launch
-    | Close
+    | Menue
 
 
 init : Model
 init =
     { level = LevelSyntax.text "press n at any time to return to the Editor" <| LevelSyntax.empty
     , mousePosition = { x = 0, y = 0, xRaw = 0, yRaw = 0 }
-    , subwindowPosition = { x = 200, y = 200 }
+    , subwindowPosition = { x = 400, y = 200 }
     , state = NoOp
     }
 
@@ -99,9 +99,9 @@ buttons =
       , condition = \model -> model.state == NoOp
       , onClick = \model -> { model | level = LevelSyntax.asZone <| LevelSyntax.asDead <| LevelSyntax.player model.mousePosition.x model.mousePosition.y model.level, state = DraggingThing 0 }
       }
-    , { name = "Close Editor"
+    , { name = "Menue"
       , condition = \model -> model.state == NoOp
-      , onClick = \model -> { model | state = Close }
+      , onClick = \model -> { model | state = Menue }
       }
     , { name = "Play Level"
       , condition = \model -> model.state == NoOp
@@ -367,8 +367,8 @@ update msg ({ level } as model) =
         ( model'
         , if model'.state == Launch then
             Shared.Launch
-          else if model'.state == Close then
-            Shared.Play
+          else if model'.state == Menue then
+            Shared.Menue
           else
             Shared.EndUpdate
         )
