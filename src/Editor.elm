@@ -75,6 +75,30 @@ buttons =
       , condition = \model -> model.state == NoOp
       , onClick = \model -> { model | level = LevelSyntax.bouncy model.mousePosition.x model.mousePosition.y model.level, state = DraggingThing 0 }
       }
+    , { name = "Add Block"
+      , condition = \model -> model.state == NoOp
+      , onClick = \model -> { model | level = LevelSyntax.block model.mousePosition.x model.mousePosition.y model.level, state = DraggingThing 0 }
+      }
+    , { name = "Add Enemy"
+      , condition = \model -> model.state == NoOp
+      , onClick = \model -> { model | level = LevelSyntax.enemy model.mousePosition.x model.mousePosition.y model.level, state = DraggingThing 0 }
+      }
+    , { name = "Zone Player"
+      , condition = \model -> model.state == NoOp
+      , onClick = \model -> { model | level = LevelSyntax.asZone <| LevelSyntax.player model.mousePosition.x model.mousePosition.y model.level, state = DraggingThing 0 }
+      }
+    , { name = "Zone Bouncy"
+      , condition = \model -> model.state == NoOp
+      , onClick = \model -> { model | level = LevelSyntax.asZone <| LevelSyntax.bouncy model.mousePosition.x model.mousePosition.y model.level, state = DraggingThing 0 }
+      }
+    , { name = "Zone Enemy"
+      , condition = \model -> model.state == NoOp
+      , onClick = \model -> { model | level = LevelSyntax.asZone <| LevelSyntax.enemy model.mousePosition.x model.mousePosition.y model.level, state = DraggingThing 0 }
+      }
+    , { name = "Zone Dead"
+      , condition = \model -> model.state == NoOp
+      , onClick = \model -> { model | level = LevelSyntax.asZone <| LevelSyntax.asDead <| LevelSyntax.player model.mousePosition.x model.mousePosition.y model.level, state = DraggingThing 0 }
+      }
     , { name = "Close Editor"
       , condition = \model -> model.state == NoOp
       , onClick = \model -> { model | state = Close }
