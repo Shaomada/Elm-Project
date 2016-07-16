@@ -11,12 +11,14 @@ import Shared
 import Html
 import Html.App
 import Element
+import Window
+import Task.Extra
 
 
 main : Program Never
 main =
     Html.App.program
-        { init = init ! []
+        { init = init ! [ Task.Extra.performFailproof (DisplayMsg << Display.WindowResize) Window.size ]
         , view = view
         , update = update
         , subscriptions = subscriptions
