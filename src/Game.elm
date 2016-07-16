@@ -54,8 +54,8 @@ update msg model =
             only model
 
         ( LoadLevel id, _ ) ->
-            andThen (Level.level id)
-                <| Shared.ResetViewPosition { x = 0, y = 0 }
+            andThen (Level.level id) <|
+                Shared.ResetViewPosition { x = 0, y = 0 }
 
         ( KeyDown c, Won ) ->
             case c of
