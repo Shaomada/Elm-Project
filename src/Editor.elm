@@ -15,7 +15,7 @@ import Color
 
 type alias Model =
     { level : LevelSyntax.Model
-    , mousePosition : { x : Float, y : Float, xRaw : Float, yRaw: Float }
+    , mousePosition : { x : Float, y : Float, xRaw : Float, yRaw : Float }
     , subwindowPosition : { x : Float, y : Float }
     , state : State
     }
@@ -326,6 +326,7 @@ update msg ({ level } as model) =
 
                                 DraggingSubwindow ->
                                     NoOp
+
                                 _ ->
                                     model.state
                     }

@@ -88,6 +88,7 @@ update msg model =
                             Editor.update editorMsg model.editor
                     in
                         ( { model | editor = editor' }, x )
+
                 MenueMsg menueMsg ->
                     let
                         ( menue', x ) =
@@ -107,7 +108,8 @@ update msg model =
                     Editing ->
                         update (EditorMsg <| Editor.MouseMoved pos) model'
 
-                    _ -> model ! []
+                    _ ->
+                        model ! []
 
             Shared.ResetViewPosition pos ->
                 update (DisplayMsg <| Display.ResetViewPosition pos) model'
