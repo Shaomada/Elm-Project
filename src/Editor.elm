@@ -26,6 +26,7 @@ type State
     | DraggingSubwindow
     | DraggingThing Int
     | FocusedThing Int
+    | Launch
 
 
 init : Model
@@ -72,6 +73,10 @@ buttons =
     , { name = "Add Bouncy"
       , condition = \model -> model.state == NoOp
       , onClick = \model -> { model | level = LevelSyntax.bouncy model.mousePosition.x model.mousePosition.y model.level, state = DraggingThing 0 }
+      }
+    , { name = "Play Level"
+      , condition = \model -> model.state == NoOp
+      , onClick = \model -> { model | state = Launch }
       }
     ]
 
@@ -234,7 +239,12 @@ update msg ({ level } as model) =
                         _ ->
                             { model | mousePosition = { x = x, y = y } }
     in
-        ( model', Shared.EndUpdate )
+        ( model'
+        , if model'.state == Launch then
+            Shared.Launch
+          else
+            Shared.EndUpdate
+        )
 
 
 
@@ -252,22 +262,32 @@ subscriptions model =
 
 -- VIEW
 
+
 viewFocused : Model -> List Collage.Form
 viewFocused model =
     case model.state of
-      FocusedThing i ->
-          model.level.things
-          |>    List.indexedMap (\j t -> if i==j then [Thing.viewBoundry t] else [])
-          |>    List.concat
-      _ -> []
+        FocusedThing i ->
+            model.level.things
+                |> List.indexedMap
+                    (\j t ->
+                        if i == j then
+                            [ Thing.viewBoundry t ]
+                        else
+                            []
+                    )
+                |> List.concat
+
+        _ ->
+            []
+
 
 view : Model -> ( List Collage.Form, List Collage.Form )
 view model =
     ( List.concat
-      [ List.map Thing.viewBody model.level.things
-      , viewFocused model
-      , showSubwindow model
-      ]
+        [ List.map Thing.viewBody model.level.things
+        , viewFocused model
+        , showSubwindow model
+        ]
     , []
     )
 

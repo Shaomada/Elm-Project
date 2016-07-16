@@ -5,6 +5,7 @@ type Msg
     = EndUpdate
     | MouseMoved { x : Float, y : Float }
     | ResetViewPosition { x : Float, y : Float }
+    | Launch
 
 
 andThen : a -> Msg -> ( a, Msg )

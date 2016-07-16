@@ -5,6 +5,7 @@ import Game
 import GameModel
 import Editor
 import Level
+import LevelData
 import Shared
 import Html
 import Html.App
@@ -97,6 +98,9 @@ update msg model =
 
             Shared.ResetViewPosition pos ->
                 update (DisplayMsg <| Display.ResetViewPosition pos) model'
+
+            Shared.Launch ->
+                { model | game = LevelData.finalise -1 model.editor.level, state = Playing } ! []
 
 
 
