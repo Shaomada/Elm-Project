@@ -107,6 +107,100 @@ buttons =
       , condition = \model -> model.state == NoOp
       , onClick = \model -> { model | state = Launch }
       }
+    , { name = "Delete"
+      , condition =
+            \model ->
+                case model.state of
+                    FocusedThing i ->
+                        True
+
+                    _ ->
+                        False
+      , onClick =
+            \({ level } as model) ->
+                case model.state of
+                    FocusedThing i ->
+                        { model
+                            | level =
+                                { level
+                                    | things =
+                                        level.things
+                                            |> List.indexedMap
+                                                (\j t ->
+                                                    if i == j then
+                                                        Nothing
+                                                    else
+                                                        Just t
+                                                )
+                                            |> List.filterMap identity
+                                }
+                        }
+
+                    _ ->
+                        model
+      }
+    , { name = "+ Radius"
+      , condition =
+            \model ->
+                case model.state of
+                    FocusedThing i ->
+                        True
+
+                    _ ->
+                        False
+      , onClick =
+            \({ level } as model) ->
+                case model.state of
+                    FocusedThing i ->
+                        { model
+                            | level =
+                                { level
+                                    | things =
+                                        level.things
+                                            |> List.indexedMap
+                                                (\j t ->
+                                                    if i == j then
+                                                        { t | radius = t.radius * 1.1 }
+                                                    else
+                                                        t
+                                                )
+                                }
+                        }
+
+                    _ ->
+                        model
+      }
+    , { name = "- Radius"
+      , condition =
+            \model ->
+                case model.state of
+                    FocusedThing i ->
+                        True
+
+                    _ ->
+                        False
+      , onClick =
+            \({ level } as model) ->
+                case model.state of
+                    FocusedThing i ->
+                        { model
+                            | level =
+                                { level
+                                    | things =
+                                        level.things
+                                            |> List.indexedMap
+                                                (\j t ->
+                                                    if i == j then
+                                                        { t | radius = t.radius / 1.1 }
+                                                    else
+                                                        t
+                                                )
+                                }
+                        }
+
+                    _ ->
+                        model
+      }
     ]
 
 
@@ -230,8 +324,10 @@ update msg ({ level } as model) =
                                 DraggingThing i ->
                                     FocusedThing i
 
-                                _ ->
+                                DraggingSubwindow ->
                                     NoOp
+                                _ ->
+                                    model.state
                     }
 
                 MouseMoved { x, y } ->
