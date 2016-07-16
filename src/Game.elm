@@ -60,7 +60,10 @@ update msg model =
         ( KeyDown c, Won ) ->
             case c of
                 'N' ->
-                    update (LoadLevel <| model.level + 1) model
+                    if (model.level == -1) then
+                        ( model, Shared.OpenEditor )
+                    else
+                        update (LoadLevel <| model.level + 1) model
 
                 'R' ->
                     update (LoadLevel model.level) model
@@ -70,6 +73,12 @@ update msg model =
 
         ( KeyDown c, Running ) ->
             case c of
+                'N' ->
+                    if (model.level == -1) then
+                        ( model, Shared.OpenEditor )
+                    else
+                        only model
+
                 'R' ->
                     update (LoadLevel model.level) model
 
@@ -84,6 +93,12 @@ update msg model =
 
         ( KeyDown c, Paused ) ->
             case c of
+                'N' ->
+                    if (model.level == -1) then
+                        ( model, Shared.OpenEditor )
+                    else
+                        only model
+
                 'R' ->
                     update (LoadLevel model.level) model
 
@@ -169,17 +184,17 @@ subscriptions model =
 
 
 view : Model -> ( List Collage.Form, List Collage.Form )
-view { things, state, text } =
-    ( List.map (\layer -> List.map (Thing.view layer) things) [ 0, 1, 2, 3 ]
+view model =
+    ( List.map (\layer -> List.map (Thing.view layer) model.things) [ 0, 1, 2, 3 ]
         |> List.concat
-    , message state text
+    , message model
     )
 
 
-message : GameState -> List String -> List Collage.Form
-message state text =
-    case state of
-        Won ->
+message : Model -> List Collage.Form
+message model =
+    case ( model.state, model.level /= -1 ) of
+        ( Won, True ) ->
             [ "Victory"
                 |> Text.fromString
                 |> Text.style
@@ -207,8 +222,36 @@ message state text =
                 |> Collage.move ( 0, -100 )
             ]
 
-        Running ->
-            text
+        ( Won, False ) ->
+            [ "Victory"
+                |> Text.fromString
+                |> Text.style
+                    { typeface = []
+                    , height = Just 100
+                    , color = Color.lightPurple
+                    , bold = True
+                    , italic = False
+                    , line = Nothing
+                    }
+                |> Collage.text
+                |> Collage.alpha 0.8
+            , "Press n to return to the Editor"
+                |> Text.fromString
+                |> Text.style
+                    { typeface = []
+                    , height = Just 30
+                    , color = Color.lightPurple
+                    , bold = False
+                    , italic = False
+                    , line = Nothing
+                    }
+                |> Collage.text
+                |> Collage.alpha 0.8
+                |> Collage.move ( 0, -100 )
+            ]
+
+        ( Running, _ ) ->
+            model.text
                 |> List.indexedMap
                     (\line message ->
                         message
@@ -226,7 +269,7 @@ message state text =
                             |> Collage.move ( 0, -40 * toFloat (3 + line) )
                     )
 
-        Paused ->
+        ( Paused, _ ) ->
             [ "Paused"
                 |> Text.fromString
                 |> Text.style

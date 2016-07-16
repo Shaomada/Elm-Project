@@ -31,7 +31,7 @@ type State
 
 init : Model
 init =
-    { level = LevelSyntax.bouncy 100 100 <| LevelSyntax.player 0 0 <| LevelSyntax.empty
+    { level = LevelSyntax.text "press n at any time to return to the Editor" <| LevelSyntax.empty
     , mousePosition = { x = 0, y = 0 }
     , subwindowPosition = { x = 0, y = 0 }
     , state = NoOp

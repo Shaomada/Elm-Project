@@ -102,6 +102,9 @@ update msg model =
             Shared.Launch ->
                 { model | game = LevelData.finalise -1 model.editor.level, state = Playing } ! []
 
+            Shared.OpenEditor ->
+                { model | state = Editing } ! []
+
 
 
 -- SUBSCRIPTIONS

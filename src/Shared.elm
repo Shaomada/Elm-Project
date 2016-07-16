@@ -6,6 +6,7 @@ type Msg
     | MouseMoved { x : Float, y : Float }
     | ResetViewPosition { x : Float, y : Float }
     | Launch
+    | OpenEditor
 
 
 andThen : a -> Msg -> ( a, Msg )
