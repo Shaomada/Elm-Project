@@ -105,6 +105,10 @@ update msg model =
             Shared.OpenEditor ->
                 { model | state = Editing } ! []
 
+            Shared.Play ->
+                update (DisplayMsg <| Display.ResetViewPosition { x = 0, y = 0 })
+                    { model | game = Level.level 0, state = Playing }
+
 
 
 -- SUBSCRIPTIONS

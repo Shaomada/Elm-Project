@@ -7,6 +7,7 @@ type Msg
     | ResetViewPosition { x : Float, y : Float }
     | Launch
     | OpenEditor
+    | Play
 
 
 andThen : a -> Msg -> ( a, Msg )

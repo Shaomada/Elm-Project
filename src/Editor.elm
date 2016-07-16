@@ -27,6 +27,7 @@ type State
     | DraggingThing Int
     | FocusedThing Int
     | Launch
+    | Close
 
 
 init : Model
@@ -73,6 +74,10 @@ buttons =
     , { name = "Add Bouncy"
       , condition = \model -> model.state == NoOp
       , onClick = \model -> { model | level = LevelSyntax.bouncy model.mousePosition.x model.mousePosition.y model.level, state = DraggingThing 0 }
+      }
+    , { name = "Close Editor"
+      , condition = \model -> model.state == NoOp
+      , onClick = \model -> { model | state = Close }
       }
     , { name = "Play Level"
       , condition = \model -> model.state == NoOp
@@ -242,6 +247,8 @@ update msg ({ level } as model) =
         ( model'
         , if model'.state == Launch then
             Shared.Launch
+          else if model'.state == Close then
+            Shared.Play
           else
             Shared.EndUpdate
         )
